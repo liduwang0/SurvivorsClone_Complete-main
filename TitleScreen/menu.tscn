@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dcyka5e06knff"]
 
-[ext_resource type="Script" path="res://TitleScreen/menu.gd" id="1_oi0p3"]
+[ext_resource type="Script" uid="uid://w1txy10m20c0" path="res://TitleScreen/menu.gd" id="1_oi0p3"]
 [ext_resource type="FontFile" uid="uid://cb4e8g30xxp5u" path="res://Font/tenderness.otf" id="1_xdjxl"]
 [ext_resource type="PackedScene" uid="uid://b7c7gsdx2rkjm" path="res://Utility/basic_button.tscn" id="3_kwsdd"]
 

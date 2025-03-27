@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://b4xujaakdsubi"]
 
 [ext_resource type="Texture2D" uid="uid://bu2son8g2konp" path="res://Textures/Items/Weapons/sword.png" id="1_583l0"]
-[ext_resource type="Script" path="res://Utility/item_option.gd" id="1_unejd"]
+[ext_resource type="Script" uid="uid://5t2ge8oyssxp" path="res://Utility/item_option.gd" id="1_unejd"]
 [ext_resource type="FontFile" uid="uid://cb4e8g30xxp5u" path="res://Font/tenderness.otf" id="2_wif5r"]
 
 [node name="ItemOption" type="ColorRect"]
