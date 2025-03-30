@@ -5,7 +5,7 @@ extends CharacterBody2D
 @export var knockback_recovery = 3.5
 @export var experience = 1
 @export var enemy_damage = 1
-@export var explosion_damage = 2
+@export var explosion_damage = 10
 @export var explosion_radius = 50
 
 var knockback = Vector2.ZERO

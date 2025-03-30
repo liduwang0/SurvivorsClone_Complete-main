@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bx26vrpyos7bo"]
+[gd_scene load_steps=14 format=3 uid="uid://bx26vrpyos7bo"]
 
 [ext_resource type="Script" uid="uid://bgnxr1ce3vj68" path="res://Enemy/enemy.gd" id="1_1bh7b"]
 [ext_resource type="Texture2D" uid="uid://6hssitn8p3vl" path="res://Textures/Enemy/Strawberry.png" id="2_mm2yx"]
@@ -59,10 +59,28 @@ tracks/0/keys = {
 "values": [8, 9, 10, 11, 12, 13, 14, 15]
 }
 
+[sub_resource type="Animation" id="Animation_5on2b"]
+resource_name = "hurt"
+length = 0.4
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [24, 25, 26, 27]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_regpg"]
 _data = {
 &"RESET": SubResource("Animation_xfnyu"),
 &"dead": SubResource("Animation_ikc3m"),
+&"hurt": SubResource("Animation_5on2b"),
 &"walk": SubResource("Animation_w8hns")
 }
 

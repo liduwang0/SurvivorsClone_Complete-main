@@ -7,7 +7,7 @@ extends CharacterBody2D
 @export var experience = 1
 @export var enemy_damage = 1
 var knockback = Vector2.ZERO
-
+var is_dead = false
 @onready var player = get_tree().get_first_node_in_group("player")
 @onready var loot_base = get_tree().get_first_node_in_group("loot")
 @onready var sprite = $Sprite2D
@@ -26,6 +26,8 @@ func _ready():
 	hitBox.damage = enemy_damage
 
 func _physics_process(_delta):
+	if is_dead:
+		return
 	# 原有的击退逻辑
 	knockback = knockback.move_toward(Vector2.ZERO, knockback_recovery)
 	var direction = global_position.direction_to(player.global_position)
@@ -44,6 +46,7 @@ func _physics_process(_delta):
 		anim.play("walk")
 
 func death():
+	is_dead = true
 	emit_signal("remove_from_array", self)
 	
 	# 禁用物理处理和碰撞，避免继续移动或造成伤害
@@ -80,11 +83,19 @@ func _on_hurt_box_hurt(damage, angle, knockback_amount):
 	hp -= damage
 	knockback = angle * knockback_amount  # 设置击退值
 	if hp <= 0:
-		death()
+		if not is_dead:  # 防止多次调用
+			death()
 	else:
 		snd_hit.play()
 		
-		# 只播放受伤动画，不需要信号连接逻辑
+		# 播放受伤动画，并确保动画完成后恢复行走
 		if anim.has_animation("hurt") and anim.current_animation != "hurt":
 			anim.play("hurt")
-			# 不再需要信号连接，由_physics_process处理恢复
+			
+			# 如果没有连接动画完成信号，添加连接
+			if not anim.is_connected("animation_finished", _on_hurt_animation_finished):
+				anim.connect("animation_finished", _on_hurt_animation_finished)
+				
+func _on_hurt_animation_finished(anim_name):
+	if anim_name == "hurt" and not is_dead:
+		anim.play("walk")  # 受伤动画结束后恢复行走

@@ -1,9 +1,10 @@
-[gd_scene load_steps=21 format=3 uid="uid://du6qbgqucaqov"]
+[gd_scene load_steps=22 format=3 uid="uid://du6qbgqucaqov"]
 
 [ext_resource type="Texture2D" uid="uid://b6umklllf2jsl" path="res://Textures/dirt_full_new.png" id="1_3v41d"]
 [ext_resource type="PackedScene" uid="uid://dncgepmkc4jf4" path="res://Player/player.tscn" id="2_40uwv"]
 [ext_resource type="PackedScene" uid="uid://ba2claihwes2y" path="res://Utility/enemy_spawner.tscn" id="3_p01g4"]
 [ext_resource type="PackedScene" uid="uid://bx26vrpyos7bo" path="res://Enemy/enemy_strawberry.tscn" id="4_ee8bm"]
+[ext_resource type="PackedScene" uid="uid://bnhpyhted0jgh" path="res://Enemy/enemy_banana.tscn" id="5_h2aik"]
 [ext_resource type="Script" uid="uid://b0nbp3g8lr7lh" path="res://Utility/spawn_info.gd" id="5_jj7s8"]
 [ext_resource type="PackedScene" uid="uid://bbvhxvk65o8el" path="res://Enemy/enemy_tomato.tscn" id="6_rumbx"]
 [ext_resource type="PackedScene" uid="uid://bok7kd2psi5gl" path="res://Enemy/enemy_cyclops.tscn" id="7_unri0"]
@@ -16,7 +17,7 @@
 script = ExtResource("5_jj7s8")
 time_start = 0
 time_end = 30
-enemy = ExtResource("6_rumbx")
+enemy = ExtResource("5_h2aik")
 enemy_num = 4
 enemy_spawn_delay = 0
 
