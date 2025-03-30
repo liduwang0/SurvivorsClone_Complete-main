@@ -58,11 +58,11 @@ func death():
 	$HitBox.monitoring = false
 	
 		# 先播放受伤动画
-	if anim.has_animation("hurt"):
-		anim.play("hurt")
+	if anim.has_animation("attack"):
+		anim.play("attack")
 		
 		# 简单闪烁效果
-		var flash_count = 5  # 闪烁5次
+		var flash_count = 4  # 闪烁5次
 		for i in range(flash_count):
 			sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
 			await get_tree().create_timer(0.1).timeout
