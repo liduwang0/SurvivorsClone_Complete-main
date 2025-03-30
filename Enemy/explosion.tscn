@@ -1,11 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://cfae4g65cgrp3"]
+[gd_scene load_steps=8 format=3 uid="uid://cfae4g65cgrp3"]
 
 [ext_resource type="Texture2D" uid="uid://1ssvsta63i3h" path="res://Textures/Enemy/explosion_pixelfied.png" id="1_xvhqw"]
 [ext_resource type="Script" uid="uid://dub7wllpkt2e2" path="res://Enemy/explosion.gd" id="2_d6gja"]
 [ext_resource type="AudioStream" uid="uid://bkehg6pw6gs2h" path="res://Audio/SoundEffect/enemy_death.ogg" id="2_wsm1y"]
+[ext_resource type="PackedScene" uid="uid://uhr6mtuisqm1" path="res://Utility/hit_box.tscn" id="4_vexy0"]
 
 [sub_resource type="Animation" id="Animation_064th"]
-length = 0.001
+step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -13,10 +14,10 @@ tracks/0/path = NodePath(".:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0.001, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [0]
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 }
 
 [sub_resource type="Animation" id="Animation_5pd2w"]
@@ -47,6 +48,7 @@ z_index = 1
 texture = ExtResource("1_xvhqw")
 hframes = 4
 vframes = 4
+frame = 10
 script = ExtResource("2_d6gja")
 
 [node name="snd_explosion" type="AudioStreamPlayer2D" parent="."]
@@ -56,7 +58,9 @@ autoplay = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_w1lln")
+&"": SubResource("AnimationLibrary_w1lln")
 }
+
+[node name="HitBox" parent="." instance=ExtResource("4_vexy0")]
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

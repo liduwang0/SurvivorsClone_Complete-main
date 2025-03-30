@@ -41,6 +41,23 @@ tracks/0/keys = {
 "values": [80, 81, 82, 83, 84, 85, 85, 85]
 }
 
+[sub_resource type="Animation" id="Animation_27qdn"]
+resource_name = "hurt"
+length = 0.4
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [64, 65, 66, 67]
+}
+
 [sub_resource type="Animation" id="Animation_w8hns"]
 resource_name = "walk"
 length = 1.2
@@ -59,23 +76,6 @@ tracks/0/keys = {
 "values": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
 }
 
-[sub_resource type="Animation" id="Animation_27qdn"]
-resource_name = "hurt"
-length = 0.4
-loop_mode = 2
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [64, 65, 66, 67]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_regpg"]
 _data = {
 &"RESET": SubResource("Animation_xfnyu"),
@@ -90,7 +90,7 @@ size = Vector2(14, 18)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ucec4"]
 size = Vector2(12, 18)
 
-[node name="enemy_strawberry" type="CharacterBody2D"]
+[node name="enemy_banana" type="CharacterBody2D"]
 collision_layer = 5
 collision_mask = 5
 motion_mode = 1

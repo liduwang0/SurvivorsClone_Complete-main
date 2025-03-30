@@ -1,6 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://bbvhxvk65o8el"]
+[gd_scene load_steps=14 format=3 uid="uid://bbvhxvk65o8el"]
 
-[ext_resource type="Script" uid="uid://bgnxr1ce3vj68" path="res://Enemy/enemy.gd" id="1_l5ux5"]
+[ext_resource type="Script" uid="uid://bbea6nmm50rew" path="res://Enemy/enemy_explode.gd" id="1_l5ux5"]
 [ext_resource type="Texture2D" uid="uid://dwebk504yrptx" path="res://Textures/Enemy/Tomato Sprite Sheet.png" id="2_po1tl"]
 [ext_resource type="PackedScene" uid="uid://xy3cvpwdy828" path="res://Utility/hurt_box.tscn" id="3_56dop"]
 [ext_resource type="PackedScene" uid="uid://uhr6mtuisqm1" path="res://Utility/hit_box.tscn" id="4_yexrv"]
@@ -24,6 +24,22 @@ tracks/0/keys = {
 "values": [0]
 }
 
+[sub_resource type="Animation" id="Animation_yteaa"]
+resource_name = "dead"
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [36, 37, 38, 39, 40, 41, 42, 43, 44, 44]
+}
+
 [sub_resource type="Animation" id="Animation_w8hns"]
 resource_name = "walk"
 length = 0.8
@@ -42,8 +58,9 @@ tracks/0/keys = {
 "values": [9, 10, 11, 12, 13, 14, 15, 16]
 }
 
-[sub_resource type="Animation" id="Animation_yteaa"]
-resource_name = "dead"
+[sub_resource type="Animation" id="Animation_l5ux5"]
+resource_name = "hurt"
+length = 0.4
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -52,16 +69,17 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [36, 37, 38, 39, 40, 41, 42, 43, 44, 44]
+"values": [18, 19, 20, 21]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_regpg"]
 _data = {
 &"RESET": SubResource("Animation_xfnyu"),
 &"dead": SubResource("Animation_yteaa"),
+&"hurt": SubResource("Animation_l5ux5"),
 &"walk": SubResource("Animation_w8hns")
 }
 
@@ -71,13 +89,13 @@ size = Vector2(15, 15)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ucec4"]
 size = Vector2(12.5, 14.5)
 
-[node name="enemy_kobold_strong" type="CharacterBody2D"]
+[node name="enemy_tomato" type="CharacterBody2D"]
 collision_layer = 5
 collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_l5ux5")
 movement_speed = 28.0
-hp = 20
+hp = 5
 enemy_damage = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
