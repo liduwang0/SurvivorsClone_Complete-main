@@ -129,7 +129,6 @@ vertical_alignment = 2
 
 [node name="HealthBar" type="TextureProgressBar" parent="GUILayer/GUI"]
 unique_name_in_owner = true
-self_modulate = Color(1, 1, 1, 0.392157)
 layout_mode = 0
 offset_left = 304.0
 offset_top = 200.0
