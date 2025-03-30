@@ -1,11 +1,11 @@
 extends CharacterBody2D
 
-@export var movement_speed = 20.0
+@export var movement_speed = 30.0
 @export var hp = 10
 @export var knockback_recovery = 3.5
 @export var experience = 1
 @export var enemy_damage = 1
-@export var explosion_damage = 10
+@export var explosion_damage = 5
 @export var explosion_radius = 50
 
 var knockback = Vector2.ZERO
@@ -88,8 +88,8 @@ func death():
 # 当死亡动画完成时调用
 func _on_death_animation_finished(anim_name):
 	if anim_name == "dead":
-		print("============= 番茄死亡，准备爆炸 =============")
-		print("当前位置:", global_position)
+		#print("============= 番茄死亡，准备爆炸 =============")
+		#print("当前位置:", global_position)
 		
 
 		
@@ -129,7 +129,7 @@ func damage_nearby_enemies():
 	t.timeout.connect(func(): explosion_circle.queue_free())
 	
 	# 原有爆炸代码保持不变
-	print("============= 开始爆炸伤害调试 =============")
+	#print("============= 开始爆炸伤害调试 =============")
 	
 
 	print("============= 开始爆炸伤害调试 =============")
