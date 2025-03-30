@@ -24,6 +24,11 @@ var exp_gem = preload("res://Objects/experience_gem.tscn")
 
 signal remove_from_array(object)
 
+# 在现有变量声明部分添加这些变量
+var can_attack = true
+var attack_cooldown = 0.5  # 攻击冷却时间为0.5秒
+var attack_timer = 0.0
+var attack_range = 15.0  # 攻击范围，可以根据需要调整
 
 func _ready():
 	anim.play("walk")
@@ -37,10 +42,21 @@ func _ready():
 	hit_flash_timer.one_shot = true
 	add_child(hit_flash_timer)
 	hit_flash_timer.timeout.connect(reset_modulate)
+	
+	# 连接动画完成信号
+	if !anim.animation_finished.is_connected(_on_animation_finished):
+		anim.animation_finished.connect(_on_animation_finished)
 
 func _physics_process(_delta):
 	if is_dead:
 		return
+	
+	# 处理攻击冷却
+	if !can_attack:
+		attack_timer += _delta
+		if attack_timer >= attack_cooldown:
+			can_attack = true
+			attack_timer = 0.0
 		
 	# 原有的击退逻辑
 	knockback = knockback.move_toward(Vector2.ZERO, knockback_recovery)
@@ -48,32 +64,30 @@ func _physics_process(_delta):
 	# 计算方向并确保归一化
 	var direction = global_position.direction_to(player.global_position).normalized()
 	
-	# 打印方向和速度信息进行调试
-	#print("Direction: ", direction, " Speed: ", movement_speed, " Velocity: ", direction * movement_speed)
+	# 计算与玩家的距离
+	var distance_to_player = global_position.distance_to(player.global_position)
+	
+	# 如果足够近且可以攻击，开始攻击
+	if distance_to_player < attack_range and can_attack and anim.current_animation != "attack" and anim.has_animation("attack"):
+		anim.play("attack")
+		can_attack = false
+		attack_timer = 0.0
+	elif anim.current_animation != "attack" and anim.current_animation != "hurt" and knockback.length() < 5:
+		# 如果不在攻击或受伤动画中，播放行走动画
+		anim.play("walk")
 	
 	# 设置速度
 	velocity = direction * movement_speed
 	velocity += knockback
 	
-	# 保存移动前位置
-	var prev_pos = global_position
-	
 	# 移动
 	move_and_slide()
-	
-	# 计算实际移动距离
-	var actual_movement = global_position - prev_pos
-	# print("Actual movement: ", actual_movement.length())
 	
 	# 方向处理
 	if direction.x > 0.1:
 		sprite.flip_h = true
 	elif direction.x < -0.1:
 		sprite.flip_h = false
-		
-	# 当击退接近结束且当前在受伤动画中，恢复行走动画
-	if knockback.length() < 5 and anim.current_animation == "hurt":
-		anim.play("walk")
 
 # 添加重置颜色函数
 func reset_modulate():
@@ -143,3 +157,9 @@ func _on_hurt_box_hurt(damage, angle, knockback_amount):
 func _on_hurt_animation_finished(anim_name):
 	if anim_name == "hurt" and not is_dead:
 		anim.play("walk")  # 受伤动画结束后恢复行走
+
+# 添加动画完成回调
+func _on_animation_finished(anim_name):
+	if anim_name == "attack":
+		# 攻击动画完成后恢复行走
+		anim.play("walk")
