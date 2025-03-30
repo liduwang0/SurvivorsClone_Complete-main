@@ -15,6 +15,10 @@ var is_dead = false
 @onready var snd_hit = $snd_hit
 @onready var hitBox = $HitBox
 
+# 添加闪烁相关变量
+var original_modulate = Color(1, 1, 1, 1)
+var hit_flash_timer = null
+
 var death_anim = preload("res://Enemy/explosion.tscn")
 var exp_gem = preload("res://Objects/experience_gem.tscn")
 
@@ -24,16 +28,42 @@ signal remove_from_array(object)
 func _ready():
 	anim.play("walk")
 	hitBox.damage = enemy_damage
+	
+	# 保存原始颜色
+	original_modulate = sprite.modulate
+	
+	# 创建闪烁计时器
+	hit_flash_timer = Timer.new()
+	hit_flash_timer.one_shot = true
+	add_child(hit_flash_timer)
+	hit_flash_timer.timeout.connect(reset_modulate)
 
 func _physics_process(_delta):
 	if is_dead:
 		return
+		
 	# 原有的击退逻辑
 	knockback = knockback.move_toward(Vector2.ZERO, knockback_recovery)
-	var direction = global_position.direction_to(player.global_position)
-	velocity = direction*movement_speed
+	
+	# 计算方向并确保归一化
+	var direction = global_position.direction_to(player.global_position).normalized()
+	
+	# 打印方向和速度信息进行调试
+	#print("Direction: ", direction, " Speed: ", movement_speed, " Velocity: ", direction * movement_speed)
+	
+	# 设置速度
+	velocity = direction * movement_speed
 	velocity += knockback
+	
+	# 保存移动前位置
+	var prev_pos = global_position
+	
+	# 移动
 	move_and_slide()
+	
+	# 计算实际移动距离
+	var actual_movement = global_position - prev_pos
+	# print("Actual movement: ", actual_movement.length())
 	
 	# 方向处理
 	if direction.x > 0.1:
@@ -44,6 +74,10 @@ func _physics_process(_delta):
 	# 当击退接近结束且当前在受伤动画中，恢复行走动画
 	if knockback.length() < 5 and anim.current_animation == "hurt":
 		anim.play("walk")
+
+# 添加重置颜色函数
+func reset_modulate():
+	sprite.modulate = original_modulate
 
 func death():
 	is_dead = true
@@ -70,24 +104,34 @@ func _on_death_animation_finished(anim_name):
 		new_gem.experience = experience
 		loot_base.call_deferred("add_child", new_gem)
 		
-		# 如果您仍然想要爆炸效果，取消下面的注释
-		# var enemy_death = death_anim.instantiate()
-		# enemy_death.scale = sprite.scale
-		# enemy_death.global_position = global_position
-		# get_parent().call_deferred("add_child", enemy_death)
+		# 添加爆炸视觉效果
+		#var enemy_death = death_anim.instantiate()
+		#enemy_death.global_position = global_position
+		#get_parent().call_deferred("add_child", enemy_death)
 		
-		# 从场景中移除敌人
+		# 移除敌人
 		queue_free()
 
 func _on_hurt_box_hurt(damage, angle, knockback_amount):
 	hp -= damage
 	knockback = angle * knockback_amount  # 设置击退值
+	
+	# 无论是否死亡，都先播放受伤效果
+	snd_hit.play()
+	
+	# 添加红光闪烁效果
+	hit_flash_timer.stop()  # 停止之前的计时器
+	sprite.modulate = Color(1.5, 0.3, 0.3, 1.0)  # 红色闪烁
+	hit_flash_timer.wait_time = 0.15  # 闪烁持续0.15秒
+	hit_flash_timer.start()
+	
+	# 检查是否死亡
 	if hp <= 0:
 		if not is_dead:  # 防止多次调用
+			# 延迟一小段时间再调用death，让闪烁效果可见
+			await get_tree().create_timer(0.1).timeout
 			death()
 	else:
-		snd_hit.play()
-		
 		# 播放受伤动画，并确保动画完成后恢复行走
 		if anim.has_animation("hurt") and anim.current_animation != "hurt":
 			anim.play("hurt")
@@ -95,7 +139,7 @@ func _on_hurt_box_hurt(damage, angle, knockback_amount):
 			# 如果没有连接动画完成信号，添加连接
 			if not anim.is_connected("animation_finished", _on_hurt_animation_finished):
 				anim.connect("animation_finished", _on_hurt_animation_finished)
-				
+
 func _on_hurt_animation_finished(anim_name):
 	if anim_name == "hurt" and not is_dead:
 		anim.play("walk")  # 受伤动画结束后恢复行走
