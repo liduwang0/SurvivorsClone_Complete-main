@@ -14,8 +14,8 @@
 [ext_resource type="PackedScene" uid="uid://b7c7gsdx2rkjm" path="res://Utility/basic_button.tscn" id="12_i8esf"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nffdp"]
-radius = 4.0
-height = 16.0
+radius = 8.0
+height = 26.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yfi4i"]
 size = Vector2(12, 20)
@@ -39,7 +39,7 @@ hframes = 2
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(2, 3)
+position = Vector2(2, 1)
 shape = SubResource("CapsuleShape2D_nffdp")
 
 [node name="walkTimer" type="Timer" parent="."]
@@ -77,7 +77,6 @@ wait_time = 0.2
 unique_name_in_owner = true
 
 [node name="EnemyDetectionArea" type="Area2D" parent="."]
-visible = false
 collision_layer = 4
 collision_mask = 4
 monitorable = false
