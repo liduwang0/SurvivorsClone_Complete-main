@@ -15,6 +15,7 @@ var collected_experience = 0
 var chef_small_knife = preload("res://Player/Attack/chef_small_knife.tscn")
 var tornado = preload("res://Player/Attack/tornado.tscn")
 var chef_scissor = preload("res://Player/Attack/chef_scissor.tscn")
+var chef_big_knife = preload("res://Player/Attack/chef_big_knife.tscn")
 
 #AttackNodes
 @onready var chef_small_knifeTimer = get_node("%chef_small_knifeTimer")
@@ -47,6 +48,17 @@ var tornado_level = 0
 #chef_scissor
 var chef_scissor_ammo = 0
 var chef_scissor_level = 0
+var scissor_level = 0
+
+# 旋转菜刀相关属性
+var knife_count = 5
+var knife_distance = 70
+var rotation_speed = -2.0
+var knife_damage = 1
+var knife_scale = Vector2(1, 1)
+var base_rotation = 0.0
+var knives = []
+var chef_big_knife_level = 1
 
 
 #Enemy Related
@@ -77,14 +89,20 @@ var enemy_close = []
 #Signal
 signal playerdeath
 
+
+
 func _ready():
 	upgrade_character("chef_small_knife1")
 	attack()
 	set_expbar(experience, calculate_experiencecap())
 	_on_hurt_box_hurt(0,0,0)
+	if chef_big_knife_level > 0:
+		initialize_rotating_knives()
 
 func _physics_process(delta):
 	movement()
+	if chef_big_knife_level > 0:
+		update_rotating_knives()
 
 func movement():
 	var x_mov = Input.get_action_strength("right") - Input.get_action_strength("left")
@@ -162,18 +180,46 @@ func _on_tornado_attack_timer_timeout():
 			tornadoAttackTimer.stop()
 
 func spawn_chef_scissor():
-	var get_chef_scissor_total = chef_scissorBase.get_child_count()
-	var calc_spawns = (chef_scissor_ammo + additional_attacks) - get_chef_scissor_total
+	# 获取现有剪刀数量
+	var get_scissor_total = chef_scissorBase.get_child_count()
+	print("现有剪刀数量:", get_scissor_total)
+	
+	# 计算需要添加的剪刀数量
+	var calc_spawns = (chef_scissor_ammo + additional_attacks) - get_scissor_total
+	print("需要添加的剪刀数量:", calc_spawns)
+	
+	# 只添加新的剪刀，不清除现有的
 	while calc_spawns > 0:
 		var chef_scissor_spawn = chef_scissor.instantiate()
 		chef_scissor_spawn.global_position = global_position
 		chef_scissorBase.add_child(chef_scissor_spawn)
 		calc_spawns -= 1
-	#Upgrade chef_scissor
-	var get_chef_scissors = chef_scissorBase.get_children()
-	for i in get_chef_scissors:
+	
+	# 更新所有剪刀
+	var get_scissors = chef_scissorBase.get_children()
+	for i in get_scissors:
+		# 直接设置剪刀的等级
+		i.level = chef_scissor_level
+		
+		# 根据等级设置路径数量
+		match chef_scissor_level:
+			1:
+				i.paths = 1
+			2:
+				i.paths = 2
+			3:
+				i.paths = 3
+			4:
+				i.paths = 3
+		
+		# 如果有update_chef_scissor方法，也调用它
 		if i.has_method("update_chef_scissor"):
 			i.update_chef_scissor()
+		
+		# 打印调试信息
+		print("更新剪刀 - 等级:", chef_scissor_level)
+		if i.get("paths") != null:
+			print("剪刀路径数:", i.paths)
 
 func get_random_target():
 	if enemy_close.size() > 0:
@@ -293,6 +339,34 @@ func upgrade_character(upgrade):
 		"food":
 			hp += 20
 			hp = clamp(hp,0,maxhp)
+		"chef_big_knife1":
+			chef_big_knife_level = 1
+			knife_count = 2
+			knife_damage = 1
+			knife_distance = 70
+			rotation_speed = -2.0
+			initialize_rotating_knives()
+		"chef_big_knife2":
+			chef_big_knife_level = 2
+			knife_count = 3
+			knife_damage = 2
+			knife_distance = 80
+			rotation_speed = -2.2
+			initialize_rotating_knives()
+		"chef_big_knife3":
+			chef_big_knife_level = 3
+			knife_count = 4
+			knife_damage = 3
+			knife_distance = 90
+			rotation_speed = -2.4
+			initialize_rotating_knives()
+		"chef_big_knife4":
+			chef_big_knife_level = 4
+			knife_count = 5
+			knife_damage = 4
+			knife_distance = 100
+			rotation_speed = -2.6
+			initialize_rotating_knives()
 	adjust_gui_collection(upgrade)
 	attack()
 	var option_children = upgradeOptions.get_children()
@@ -374,3 +448,76 @@ func death():
 func _on_btn_menu_click_end():
 	get_tree().paused = false
 	var _level = get_tree().change_scene_to_file("res://TitleScreen/menu.tscn")
+
+# 旋转大刀相关函数
+func initialize_rotating_knives():
+	# 清除现有的刀
+	for knife in knives:
+		if is_instance_valid(knife):
+			knife.queue_free()
+	knives.clear()
+	
+	# 创建新的旋转刀
+	for i in range(knife_count):
+		var knife_instance = chef_big_knife.instantiate()
+		knife_instance.global_position = global_position
+		knife_instance.damage = knife_damage
+		knife_instance.scale = knife_scale
+		# 连接信号（如果需要的话）
+		knife_instance.connect("body_entered", _on_knife_body_entered)
+		add_child(knife_instance)
+		knives.append(knife_instance)
+
+func update_rotating_knives():
+	# 更新旋转刀的位置
+	var angle_step = 2 * PI / knife_count
+	base_rotation += rotation_speed * get_process_delta_time()
+	
+	for i in range(knife_count):
+		if i < knives.size() and is_instance_valid(knives[i]):
+			var angle = base_rotation + i * angle_step
+			var offset = Vector2(cos(angle), sin(angle)) * knife_distance
+			knives[i].global_position = global_position + offset
+			
+			# 更新刀的角度属性，使其指向正确的方向
+			knives[i].angle = offset.normalized()
+
+func upgrade_knife():
+	knife_count += 1
+	
+	match knife_count:
+		2:
+			knife_damage = 1
+			knife_distance = 70
+			rotation_speed = -2.0
+		3:
+			knife_damage = 2
+			knife_distance = 80
+			rotation_speed = -2.2
+		4:
+			knife_damage = 3
+			knife_distance = 90
+			rotation_speed = -2.4
+	
+	# 重新初始化旋转刀
+	initialize_rotating_knives()
+
+func _on_knife_body_entered(body):
+	if body.is_in_group("enemy"):
+		# 计算从玩家到敌人的方向向量
+		var direction_vector = body.global_position - global_position
+		
+		# 确保方向始终是从玩家推向敌人（无论敌人在哪一侧）
+		var knockback_direction = direction_vector.normalized()
+		var knockback_strength = 150  # 击退力度
+		
+		# 打印调试信息
+		print("Player pos: ", global_position)
+		print("Enemy pos: ", body.global_position)
+		print("Direction vector: ", direction_vector)
+		print("Knockback direction: ", knockback_direction)
+		
+		# 对敌人造成伤害
+		if body.has_method("_on_hurt_box_hurt"):
+			# 直接调用敌人的受伤函数，传递正确的击退方向
+			body._on_hurt_box_hurt(knife_damage, knockback_direction, knockback_strength)
