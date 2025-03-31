@@ -1,7 +1,6 @@
 [gd_scene load_steps=23 format=3 uid="uid://du6qbgqucaqov"]
 
 [ext_resource type="Texture2D" uid="uid://b6umklllf2jsl" path="res://Textures/dirt_full_new.png" id="1_3v41d"]
-[ext_resource type="PackedScene" uid="uid://dncgepmkc4jf4" path="res://Player/player.tscn" id="2_40uwv"]
 [ext_resource type="PackedScene" uid="uid://ba2claihwes2y" path="res://Utility/enemy_spawner.tscn" id="3_p01g4"]
 [ext_resource type="PackedScene" uid="uid://bx26vrpyos7bo" path="res://Enemy/enemy_strawberry.tscn" id="4_ee8bm"]
 [ext_resource type="PackedScene" uid="uid://bnhpyhted0jgh" path="res://Enemy/enemy_banana.tscn" id="5_h2aik"]
@@ -13,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://btf7clk4jja87" path="res://Enemy/enemy_super.tscn" id="9_xs42h"]
 [ext_resource type="AudioStream" uid="uid://bbufl4r1ou1rw" path="res://Audio/Music/battleThemeA.mp3" id="10_rk3we"]
 [ext_resource type="Script" uid="uid://u028ko8kxgwy" path="res://Audio/Music/snd_Music.gd" id="11_ovtx6"]
+[ext_resource type="PackedScene" uid="uid://bplxtg3s6fbo3" path="res://Player/player_chef.tscn" id="14_awrha"]
 
 [sub_resource type="Resource" id="Resource_03m25"]
 script = ExtResource("5_jj7s8")
@@ -95,7 +95,7 @@ texture = ExtResource("1_3v41d")
 region_enabled = true
 region_rect = Rect2(-4000, -4000, 4000, 4000)
 
-[node name="Player" parent="." instance=ExtResource("2_40uwv")]
+[node name="Player2" parent="." instance=ExtResource("14_awrha")]
 
 [node name="EnemySpawner" parent="." instance=ExtResource("3_p01g4")]
 spawns = Array[ExtResource("5_jj7s8")]([SubResource("Resource_03m25"), SubResource("Resource_ij20a"), SubResource("Resource_68oxv"), SubResource("Resource_l8y0x"), SubResource("Resource_daq1w"), SubResource("Resource_0gpiy"), SubResource("Resource_4teun"), SubResource("Resource_rx6id"), SubResource("Resource_t2np8")])
@@ -109,4 +109,14 @@ volume_db = -15.0
 autoplay = true
 script = ExtResource("11_ovtx6")
 
-[connection signal="playerdeath" from="Player" to="snd_Music" method="_on_player_playerdeath"]
+[node name="enemy_tomato" parent="." instance=ExtResource("6_rumbx")]
+position = Vector2(-82, -2)
+scale = Vector2(2, 2)
+
+[node name="enemy_banana" parent="." instance=ExtResource("5_h2aik")]
+position = Vector2(-114, 41)
+scale = Vector2(2, 2)
+
+[node name="enemy_strawberry" parent="." instance=ExtResource("4_ee8bm")]
+position = Vector2(-130, -4)
+scale = Vector2(2, 2)
