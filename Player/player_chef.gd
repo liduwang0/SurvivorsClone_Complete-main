@@ -12,15 +12,23 @@ var collected_experience = 0
 
 # 攻击
 var chef_big_knife = preload("res://Player/Attack/chef_big_knife.tscn")
+var chef_knife_small = preload("res://Player/Attack/chef_small_knife.tscn")
 
 # 旋转菜刀属性
 var knife_count = 5  # 菜刀数量
 var knife_distance = 70  # 菜刀距离角色的距离
-var rotation_speed = 6.0  # 旋转速度 (弧度/秒)
-var knife_damage = 0.1  # 菜刀伤害
+var rotation_speed = -2.0  # 旋转速度 (弧度/秒)
+var knife_damage = 1  # 菜刀伤害
 var knife_scale = Vector2(1, 1)  # 菜刀大小
 var base_rotation = 0.0  # 基础旋转角度
 var knives = []  # 存储所有菜刀实例
+
+# 小刀属性
+var chef_knife_small_ammo = 0
+var chef_knife_small_base_ammo = 3
+var chef_knife_small_attack_speed = 1.5
+var chef_knife_small_level = 2  # 0表示未解锁
+var chef_knife_small_timer = 0
 
 # 敌人相关
 var enemy_close = []
@@ -57,6 +65,10 @@ func _ready():
 	
 	# 设置经验条
 	expBar.max_value = experience_level * 5
+	
+	# 如果已解锁chef_knife_small，初始化弹药
+	if chef_knife_small_level > 0:
+		chef_knife_small_ammo = chef_knife_small_base_ammo
 
 func _physics_process(delta):
 	# 移动逻辑
@@ -79,6 +91,14 @@ func _physics_process(delta):
 	
 	# 更新UI
 	update_ui()
+	
+	# chef_knife_small攻击逻辑
+	if chef_knife_small_level > 0:
+		chef_knife_small_timer += delta
+		if chef_knife_small_timer >= chef_knife_small_attack_speed:
+			chef_knife_small_timer = 0
+			if chef_knife_small_ammo > 0:
+				throw_chef_knife_small()
 
 # 生成菜刀
 func spawn_knives():
@@ -192,3 +212,104 @@ func _on_knife_body_entered(body):
 
 func _on_knife_area_entered(area):
 	print("菜刀进入区域:", area.name, " 组:", area.get_groups())
+
+# 添加投掷小刀函数
+func throw_chef_knife_small():
+	# 减少弹药
+	chef_knife_small_ammo -= 1
+	
+	# 获取最近的敌人作为目标
+	var target_enemy = find_closest_enemy()
+	if target_enemy == null:
+		# 如果没有敌人，向随机方向投掷
+		var random_direction = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+		spawn_chef_knife_small(global_position, global_position + random_direction * 120)
+	else:
+		# 向最近的敌人投掷
+		spawn_chef_knife_small(global_position, target_enemy.global_position)
+	
+	# 延迟恢复弹药
+	await get_tree().create_timer(chef_knife_small_attack_speed * 2).timeout
+	chef_knife_small_ammo += 1
+
+# 生成小刀
+func spawn_chef_knife_small(start_pos, target_pos):
+	var knife_instance = chef_knife_small.instantiate()
+	knife_instance.position = start_pos
+	knife_instance.target = target_pos
+	knife_instance.level = chef_knife_small_level
+	
+	# 连接信号
+	knife_instance.connect("remove_from_array", Callable(self, "_on_chef_knife_small_removed"))
+	
+	# 添加到场景
+	get_parent().add_child(knife_instance)
+
+# 当小刀被移除时调用
+func _on_chef_knife_small_removed(knife):
+	# 可以在这里添加额外逻辑，如粒子效果等
+	pass
+
+# 查找最近的敌人
+func find_closest_enemy():
+	# 如果已有enemy_close数组，直接使用
+	if enemy_close.size() > 0:
+		var closest_enemy = null
+		var closest_distance = 100000
+		
+		for enemy in enemy_close:
+			if is_instance_valid(enemy):
+				var distance = global_position.distance_to(enemy.global_position)
+				if distance < closest_distance:
+					closest_distance = distance
+					closest_enemy = enemy
+		
+		return closest_enemy
+	
+	# 如果没有enemy_close数组，获取所有敌人
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	if enemies.size() == 0:
+		return null
+	
+	# 查找最近的敌人
+	var closest_enemy = null
+	var closest_distance = 100000
+	
+	for enemy in enemies:
+		var distance = global_position.distance_to(enemy.global_position)
+		if distance < closest_distance:
+			closest_distance = distance
+			closest_enemy = enemy
+	
+	return closest_enemy
+
+# 升级小刀攻击
+func upgrade_chef_knife_small():
+	chef_knife_small_level += 1
+	
+	match chef_knife_small_level:
+		1:
+			chef_knife_small_base_ammo = 3
+			chef_knife_small_attack_speed = 1.5
+			chef_knife_small_ammo = chef_knife_small_base_ammo
+		2:
+			chef_knife_small_base_ammo = 4
+			chef_knife_small_attack_speed = 1.3
+		3:
+			chef_knife_small_base_ammo = 5
+			chef_knife_small_attack_speed = 1.1
+		4:
+			chef_knife_small_base_ammo = 6
+			chef_knife_small_attack_speed = 0.9
+	
+	# 更新弹药数量
+	chef_knife_small_ammo = min(chef_knife_small_ammo + 1, chef_knife_small_base_ammo)
+
+
+func _on_chef_knife_small_attack_timer_timeout() -> void:
+	pass
+
+
+func _on_chef_knife_small_timer_timeout() -> void:
+	if chef_knife_small_level > 0 and chef_knife_small_ammo > 0:
+		throw_chef_knife_small()

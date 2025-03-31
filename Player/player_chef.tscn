@@ -28,7 +28,7 @@ radius = 50.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6vwp8"]
 
-[node name="Player" type="CharacterBody2D" groups=["player"]]
+[node name="Player_chef" type="CharacterBody2D" groups=["player"]]
 motion_mode = 1
 script = ExtResource("1_7s6ib")
 
@@ -60,21 +60,13 @@ shape = SubResource("RectangleShape2D_yfi4i")
 
 [node name="Attack" type="Node2D" parent="."]
 
-[node name="IceSpearTimer" type="Timer" parent="Attack"]
+[node name="KnifeSmallTimer" type="Timer" parent="Attack"]
 unique_name_in_owner = true
 wait_time = 1.5
 
-[node name="IceSpearAttackTimer" type="Timer" parent="Attack/IceSpearTimer"]
+[node name="KnifeSmallAttackTimer" type="Timer" parent="Attack/KnifeSmallTimer"]
 unique_name_in_owner = true
 wait_time = 0.075
-
-[node name="TornadoTimer" type="Timer" parent="Attack"]
-unique_name_in_owner = true
-wait_time = 3.0
-
-[node name="TornadoAttackTimer" type="Timer" parent="Attack/TornadoTimer"]
-unique_name_in_owner = true
-wait_time = 0.2
 
 [node name="KnifeBase" type="Node2D" parent="Attack"]
 unique_name_in_owner = true
@@ -242,10 +234,8 @@ offset_bottom = 56.0
 columns = 10
 
 [connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]
-[connection signal="timeout" from="Attack/IceSpearTimer" to="." method="_on_ice_spear_timer_timeout"]
-[connection signal="timeout" from="Attack/IceSpearTimer/IceSpearAttackTimer" to="." method="_on_ice_spear_attack_timer_timeout"]
-[connection signal="timeout" from="Attack/TornadoTimer" to="." method="_on_tornado_timer_timeout"]
-[connection signal="timeout" from="Attack/TornadoTimer/TornadoAttackTimer" to="." method="_on_tornado_attack_timer_timeout"]
+[connection signal="timeout" from="Attack/KnifeSmallTimer" to="." method="_on_knife_small_timer_timeout"]
+[connection signal="timeout" from="Attack/KnifeSmallTimer/KnifeSmallAttackTimer" to="." method="_on_knife_small_attack_timer_timeout"]
 [connection signal="body_entered" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_entered"]
 [connection signal="body_exited" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_exited"]
 [connection signal="area_entered" from="GrabArea" to="." method="_on_grab_area_area_entered"]

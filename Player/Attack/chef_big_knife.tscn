@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bffnps2hy3re5"]
 
 [ext_resource type="Script" uid="uid://bvat8y8f7fwpw" path="res://Player/Attack/chef_big_knife.gd" id="1_sq5wa"]
-[ext_resource type="Texture2D" uid="uid://jjt1rh5e2jcp" path="res://Textures/Items/Weapons/ice_spear.png" id="2_t3lwf"]
+[ext_resource type="Texture2D" uid="uid://br0piamwjw48v" path="res://Textures/Items/Weapons/knife_big.png" id="2_sq5wa"]
 [ext_resource type="AudioStream" uid="uid://cl3g2vts3nyt0" path="res://Audio/SoundEffect/ice.wav" id="3_f1ppk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p4tiy"]
@@ -15,10 +15,12 @@ collision_mask = 0
 script = ExtResource("1_sq5wa")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_t3lwf")
+scale = Vector2(0.013916, 0.013916)
+texture = ExtResource("2_sq5wa")
+flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0.500001, -0.999999)
+position = Vector2(0, -5.96046e-08)
 rotation = -0.785398
 shape = SubResource("RectangleShape2D_p4tiy")
 
