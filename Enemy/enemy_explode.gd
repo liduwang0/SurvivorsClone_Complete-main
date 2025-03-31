@@ -212,6 +212,12 @@ func _find_all_enemies(node, result):
 func _on_hurt_box_hurt(damage, angle, knockback_amount):
 	hp -= damage
 	knockback = angle * knockback_amount  # 设置击退值
+	
+		# 在这里添加受伤变红效果 ↓↓↓
+	sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
+	await get_tree().create_timer(0.2).timeout
+	sprite.modulate = Color(1, 1, 1, 1)  # 恢复正常
+	
 	if hp <= 0:
 		if not is_dead:  # 防止多次调用
 			death()
