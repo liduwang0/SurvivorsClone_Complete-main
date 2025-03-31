@@ -1,0 +1,19 @@
+0.1.0
+
+character has stable version, can update weaponse, rotate big knife is repaired
+
+太好了！问题终于解决了。
+最终的原因是：角度 (angle) 属性没有被正确更新。
+具体来说，问题出在以下几个关键点：
+缺少调用 update_angle 函数：
+在 player_test.gd 的 update_rotating_knives 函数中没有调用 update_angle 方法
+而 update_angle 函数负责将菜刀的 angle 属性设置为从玩家到菜刀的方向向量
+默认值问题：
+chef_big_knife.gd 中的 angle 属性默认值是 Vector2.RIGHT
+如果没有调用 update_angle 更新它，它就会保持这个向右的默认值
+伤害系统的工作流程：
+hurt_box.gd 中的代码在敌人受伤时会获取武器的 angle 属性
+然后将这个方向传递给敌人的 _on_hurt_box_hurt 函数
+如果 angle 始终是 Vector2.RIGHT，敌人就会一直向右击退
+解决方案是确保在每次更新菜刀位置时，都调用 update_angle 函数来更新它的击退方向。这样，击退方向就会是从玩家位置指向菜刀的方向，实现相对玩家向外击退的效果。
+这个问题展示了游戏开发中一个常见的陷阱：在多个系统交互时，确保所有必要的函数都被正确调用是很重要的，尤其是当涉及到默认值时。

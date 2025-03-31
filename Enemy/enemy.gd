@@ -126,9 +126,12 @@ func _on_death_animation_finished(anim_name):
 		# 移除敌人
 		queue_free()
 
-func _on_hurt_box_hurt(damage, angle, knockback_amount):
-	hp -= damage
-	knockback = angle * knockback_amount  # 设置击退值
+func _on_hurt_box_hurt(damage_amount, knockback_direction, knockback_strength):
+	hp -= damage_amount
+	# 打印调试信息
+	print("受到伤害! 方向: ", knockback_direction, " 强度: ", knockback_strength)
+	# 设置击退
+	knockback = knockback_direction * knockback_strength
 	
 	# 无论是否死亡，都先播放受伤效果
 	snd_hit.play()

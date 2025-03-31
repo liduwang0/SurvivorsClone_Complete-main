@@ -13,27 +13,27 @@ func _ready():
 	# 将自己添加到"attack"组，这样敌人的HurtBox可以识别
 	add_to_group("attack")
 
-# 当菜刀击中敌人时调用
-func enemy_hit(_charge = 1):
-	# 每次击中敌人时，发出信号
-	# 这样可以立即从hit_once_array中移除自己
-	emit_signal("remove_from_array", self)
-	pass
-
-# 添加一个区域进入信号处理函数，用于调试
-func _on_area_entered(area):
-	print("菜刀区域进入:", area.name)
-
-func _on_body_entered(body):
-	print("菜刀碰撞到:", body.name)
-
-# 更新角度 - 在player_chef.gd中的update_knife_positions函数中调用
+# 修复函数 - 这是关键!
 func update_angle(player_position):
 	# 计算从玩家到菜刀的方向向量
-	angle = (global_position - player_position).normalized()
+	var new_angle = (global_position - player_position).normalized()
+	# 确保这个向量不是零向量
+	if new_angle.length() < 0.1:
+		new_angle = Vector2.RIGHT  # 防止零向量
 	
-	# 添加调试信息
-	#print("菜刀角度更新: ", angle, " 位置: ", global_position, " 玩家位置: ", player_position)
+	# 强制调试打印
+	print(">>>>>> 更新菜刀角度 <<<<<< ID:", get_instance_id())
+	print("原始角度:", angle)
+	print("新角度:", new_angle)
+	print("菜刀位置:", global_position)
+	print("玩家位置:", player_position)
+	
+	# 设置新的角度
+	angle = new_angle
+
+# 保持原来的 enemy_hit 函数简单实现
+func enemy_hit(_charge = 1):
+	emit_signal("remove_from_array", self)
 
 func _process(delta):
 	# 计时器

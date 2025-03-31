@@ -51,14 +51,14 @@ var chef_scissor_level = 0
 var scissor_level = 0
 
 # 旋转菜刀相关属性
-var knife_count = 5
+var knife_count = 0
 var knife_distance = 70
 var rotation_speed = -2.0
 var knife_damage = 1
 var knife_scale = Vector2(1, 1)
 var base_rotation = 0.0
 var knives = []
-var chef_big_knife_level = 1
+var chef_big_knife_level = 0
 
 
 #Enemy Related
@@ -102,6 +102,11 @@ func _ready():
 func _physics_process(delta):
 	movement()
 	if chef_big_knife_level > 0:
+		update_rotating_knives()
+
+func _process(delta):
+	# 如果有旋转刀，更新它们的位置
+	if knife_count + additional_attacks > 0:
 		update_rotating_knives()
 
 func movement():
@@ -336,6 +341,8 @@ func upgrade_character(upgrade):
 			spell_cooldown += 0.05
 		"ring1","ring2":
 			additional_attacks += 1
+			if chef_big_knife_level > 0:
+				initialize_rotating_knives()
 		"food":
 			hp += 20
 			hp = clamp(hp,0,maxhp)
@@ -457,67 +464,63 @@ func initialize_rotating_knives():
 			knife.queue_free()
 	knives.clear()
 	
+	# 计算总刀数，包括额外攻击
+	var total_knives = knife_count + additional_attacks
+	
 	# 创建新的旋转刀
-	for i in range(knife_count):
+	for i in range(total_knives):
 		var knife_instance = chef_big_knife.instantiate()
 		knife_instance.global_position = global_position
 		knife_instance.damage = knife_damage
 		knife_instance.scale = knife_scale
-		# 连接信号（如果需要的话）
-		knife_instance.connect("body_entered", _on_knife_body_entered)
+		
+		# 修复Sprite2D帧索引问题
+		if knife_instance.has_node("Sprite2D"):
+			var sprite = knife_instance.get_node("Sprite2D")
+			sprite.frame = 0  # 设置为第一帧
+		
 		add_child(knife_instance)
 		knives.append(knife_instance)
+	
+	# 立即更新刀的位置
+	update_rotating_knives()
 
 func update_rotating_knives():
-	# 更新旋转刀的位置
-	var angle_step = 2 * PI / knife_count
+	var total_knives = knife_count + additional_attacks
+	var angle_step = 2 * PI / total_knives
 	base_rotation += rotation_speed * get_process_delta_time()
 	
-	for i in range(knife_count):
+	for i in range(total_knives):
 		if i < knives.size() and is_instance_valid(knives[i]):
+			var knife = knives[i]
 			var angle = base_rotation + i * angle_step
 			var offset = Vector2(cos(angle), sin(angle)) * knife_distance
-			knives[i].global_position = global_position + offset
+			knife.global_position = global_position + offset
 			
-			# 更新刀的角度属性，使其指向正确的方向
-			knives[i].angle = offset.normalized()
+			# 设置刀具旋转
+			knife.rotation = angle + PI  # 刀柄朝向玩家
+			
+			# 必须调用 update_angle 更新击退方向
+			if knife.has_method("update_angle"):
+				knife.update_angle(global_position)
+				print("在 player_test.gd 中调用 update_angle")
 
 func upgrade_knife():
 	knife_count += 1
 	
 	match knife_count:
 		2:
-			knife_damage = 1
+			knife_damage = 0.1
 			knife_distance = 70
 			rotation_speed = -2.0
 		3:
-			knife_damage = 2
+			knife_damage = 0.2
 			knife_distance = 80
 			rotation_speed = -2.2
 		4:
-			knife_damage = 3
+			knife_damage = 0.3
 			knife_distance = 90
 			rotation_speed = -2.4
 	
 	# 重新初始化旋转刀
 	initialize_rotating_knives()
-
-func _on_knife_body_entered(body):
-	if body.is_in_group("enemy"):
-		# 计算从玩家到敌人的方向向量
-		var direction_vector = body.global_position - global_position
-		
-		# 确保方向始终是从玩家推向敌人（无论敌人在哪一侧）
-		var knockback_direction = direction_vector.normalized()
-		var knockback_strength = 150  # 击退力度
-		
-		# 打印调试信息
-		print("Player pos: ", global_position)
-		print("Enemy pos: ", body.global_position)
-		print("Direction vector: ", direction_vector)
-		print("Knockback direction: ", knockback_direction)
-		
-		# 对敌人造成伤害
-		if body.has_method("_on_hurt_box_hurt"):
-			# 直接调用敌人的受伤函数，传递正确的击退方向
-			body._on_hurt_box_hurt(knife_damage, knockback_direction, knockback_strength)

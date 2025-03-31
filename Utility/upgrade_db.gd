@@ -100,6 +100,38 @@ const UPGRADES = {
 		"prerequisite": ["tornado3"],
 		"type": "weapon"
 	},
+	"chef_big_knife1": {
+		"icon": WEAPON_PATH + "chef_big_knife.png",
+		"displayname": "Rotating Knife",
+		"details": "Two knives rotate around you, damaging enemies they touch",
+		"level": "Level: 1",
+		"prerequisite": [],
+		"type": "weapon"
+	},
+	"chef_big_knife2": {
+		"icon": WEAPON_PATH + "chef_big_knife.png",
+		"displayname": "Rotating Knife",
+		"details": "An additional knife rotates around you and damage is increased",
+		"level": "Level: 2",
+		"prerequisite": ["chef_big_knife1"],
+		"type": "weapon"
+	},
+	"chef_big_knife3": {
+		"icon": WEAPON_PATH + "chef_big_knife.png",
+		"displayname": "Rotating Knife",
+		"details": "An additional knife rotates around you and damage is further increased",
+		"level": "Level: 3",
+		"prerequisite": ["chef_big_knife2"],
+		"type": "weapon"
+	},
+	"chef_big_knife4": {
+		"icon": WEAPON_PATH + "chef_big_knife.png",
+		"displayname": "Rotating Knife",
+		"details": "An additional knife rotates around you and damage is maximized",
+		"level": "Level: 4",
+		"prerequisite": ["chef_big_knife3"],
+		"type": "weapon"
+	},
 	"armor1": {
 		"icon": ICON_PATH + "helmet_1.png",
 		"displayname": "Armor",
