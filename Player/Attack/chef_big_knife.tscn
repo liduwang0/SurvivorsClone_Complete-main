@@ -4,8 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://br0piamwjw48v" path="res://Textures/Items/Weapons/knife_big.png" id="2_sq5wa"]
 [ext_resource type="AudioStream" uid="uid://cl3g2vts3nyt0" path="res://Audio/SoundEffect/ice.wav" id="3_f1ppk"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_p4tiy"]
-size = Vector2(6.36396, 33.234)
+[sub_resource type="CircleShape2D" id="CircleShape2D_sq5wa"]
 
 [node name="chef_big_knife" type="Area2D" groups=["attack"]]
 top_level = true
@@ -22,7 +21,7 @@ flip_h = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -5.96046e-08)
 rotation = -0.785398
-shape = SubResource("RectangleShape2D_p4tiy")
+shape = SubResource("CircleShape2D_sq5wa")
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 10.0
