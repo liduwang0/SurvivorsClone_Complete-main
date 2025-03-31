@@ -1,10 +1,11 @@
 [gd_scene load_steps=5 format=3 uid="uid://bffnps2hy3re5"]
 
 [ext_resource type="Script" uid="uid://bvat8y8f7fwpw" path="res://Player/Attack/chef_big_knife.gd" id="1_sq5wa"]
-[ext_resource type="Texture2D" uid="uid://br0piamwjw48v" path="res://Textures/Items/Weapons/knife_big.png" id="2_sq5wa"]
+[ext_resource type="Texture2D" uid="uid://cm6bfjuqdgqc5" path="res://Textures/Items/Weapons/chef_big_knife.png" id="2_sq5wa"]
 [ext_resource type="AudioStream" uid="uid://cl3g2vts3nyt0" path="res://Audio/SoundEffect/ice.wav" id="3_f1ppk"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_sq5wa"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t3lwf"]
+size = Vector2(14.1421, 42.4264)
 
 [node name="chef_big_knife" type="Area2D" groups=["attack"]]
 top_level = true
@@ -14,14 +15,14 @@ collision_mask = 0
 script = ExtResource("1_sq5wa")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.013916, 0.013916)
 texture = ExtResource("2_sq5wa")
 flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -5.96046e-08)
+position = Vector2(7.45058e-07, -9.68575e-07)
 rotation = -0.785398
-shape = SubResource("CircleShape2D_sq5wa")
+scale = Vector2(1, 1)
+shape = SubResource("RectangleShape2D_t3lwf")
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 10.0
