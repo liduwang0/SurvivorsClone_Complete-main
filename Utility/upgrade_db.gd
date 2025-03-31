@@ -4,68 +4,68 @@ extends Node
 const ICON_PATH = "res://Textures/Items/Upgrades/"
 const WEAPON_PATH = "res://Textures/Items/Weapons/"
 const UPGRADES = {
-	"icespear1": {
-		"icon": WEAPON_PATH + "ice_spear.png",
+	"chef_small_knife1": {
+		"icon": WEAPON_PATH + "chef_small_knife.png",
 		"displayname": "Ice Spear",
 		"details": "A spear of ice is thrown at a random enemy",
 		"level": "Level: 1",
 		"prerequisite": [],
 		"type": "weapon"
 	},
-	"icespear2": {
-		"icon": WEAPON_PATH + "ice_spear.png",
+	"chef_small_knife2": {
+		"icon": WEAPON_PATH + "chef_small_knife.png",
 		"displayname": "Ice Spear",
 		"details": "An addition Ice Spear is thrown",
 		"level": "Level: 2",
-		"prerequisite": ["icespear1"],
+		"prerequisite": ["chef_small_knife1"],
 		"type": "weapon"
 	},
-	"icespear3": {
-		"icon": WEAPON_PATH + "ice_spear.png",
+	"chef_small_knife3": {
+		"icon": WEAPON_PATH + "chef_small_knife.png",
 		"displayname": "Ice Spear",
 		"details": "Ice Spears now pass through another enemy and do + 3 damage",
 		"level": "Level: 3",
-		"prerequisite": ["icespear2"],
+		"prerequisite": ["chef_small_knife2"],
 		"type": "weapon"
 	},
-	"icespear4": {
-		"icon": WEAPON_PATH + "ice_spear.png",
+	"chef_small_knife4": {
+		"icon": WEAPON_PATH + "chef_small_knife.png",
 		"displayname": "Ice Spear",
 		"details": "An additional 2 Ice Spears are thrown",
 		"level": "Level: 4",
-		"prerequisite": ["icespear3"],
+		"prerequisite": ["chef_small_knife3"],
 		"type": "weapon"
 	},
-	"javelin1": {
-		"icon": WEAPON_PATH + "javelin_3_new_attack.png",
-		"displayname": "Javelin",
-		"details": "A magical javelin will follow you attacking enemies in a straight line",
+	"chef_scissor1": {
+		"icon": WEAPON_PATH + "chef_scissor_3_new_attack.png",
+		"displayname": "chef_scissor",
+		"details": "A magical chef_scissor will follow you attacking enemies in a straight line",
 		"level": "Level: 1",
 		"prerequisite": [],
 		"type": "weapon"
 	},
-	"javelin2": {
-		"icon": WEAPON_PATH + "javelin_3_new_attack.png",
-		"displayname": "Javelin",
-		"details": "The javelin will now attack an additional enemy per attack",
+	"chef_scissor2": {
+		"icon": WEAPON_PATH + "chef_scissor_3_new_attack.png",
+		"displayname": "chef_scissor",
+		"details": "The chef_scissor will now attack an additional enemy per attack",
 		"level": "Level: 2",
-		"prerequisite": ["javelin1"],
+		"prerequisite": ["chef_scissor1"],
 		"type": "weapon"
 	},
-	"javelin3": {
-		"icon": WEAPON_PATH + "javelin_3_new_attack.png",
-		"displayname": "Javelin",
-		"details": "The javelin will attack another additional enemy per attack",
+	"chef_scissor3": {
+		"icon": WEAPON_PATH + "chef_scissor_3_new_attack.png",
+		"displayname": "chef_scissor",
+		"details": "The chef_scissor will attack another additional enemy per attack",
 		"level": "Level: 3",
-		"prerequisite": ["javelin2"],
+		"prerequisite": ["chef_scissor2"],
 		"type": "weapon"
 	},
-	"javelin4": {
-		"icon": WEAPON_PATH + "javelin_3_new_attack.png",
-		"displayname": "Javelin",
-		"details": "The javelin now does + 5 damage per attack and causes 20% additional knockback",
+	"chef_scissor4": {
+		"icon": WEAPON_PATH + "chef_scissor_3_new_attack.png",
+		"displayname": "chef_scissor",
+		"details": "The chef_scissor now does + 5 damage per attack and causes 20% additional knockback",
 		"level": "Level: 4",
-		"prerequisite": ["javelin3"],
+		"prerequisite": ["chef_scissor3"],
 		"type": "weapon"
 	},
 	"tornado1": {

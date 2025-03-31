@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://btf7clk4jja87" path="res://Enemy/enemy_super.tscn" id="9_xs42h"]
 [ext_resource type="AudioStream" uid="uid://bbufl4r1ou1rw" path="res://Audio/Music/battleThemeA.mp3" id="10_rk3we"]
 [ext_resource type="Script" uid="uid://u028ko8kxgwy" path="res://Audio/Music/snd_Music.gd" id="11_ovtx6"]
-[ext_resource type="PackedScene" uid="uid://bplxtg3s6fbo3" path="res://Player/player_chef.tscn" id="14_awrha"]
+[ext_resource type="PackedScene" uid="uid://d3l66ee14h740" path="res://Player/player_test.tscn" id="13_0wqet"]
 
 [sub_resource type="Resource" id="Resource_03m25"]
 script = ExtResource("5_jj7s8")
@@ -95,8 +95,6 @@ texture = ExtResource("1_3v41d")
 region_enabled = true
 region_rect = Rect2(-4000, -4000, 4000, 4000)
 
-[node name="Player2" parent="." instance=ExtResource("14_awrha")]
-
 [node name="EnemySpawner" parent="." instance=ExtResource("3_p01g4")]
 spawns = Array[ExtResource("5_jj7s8")]([SubResource("Resource_03m25"), SubResource("Resource_ij20a"), SubResource("Resource_68oxv"), SubResource("Resource_l8y0x"), SubResource("Resource_daq1w"), SubResource("Resource_0gpiy"), SubResource("Resource_4teun"), SubResource("Resource_rx6id"), SubResource("Resource_t2np8")])
 
@@ -120,3 +118,5 @@ scale = Vector2(2, 2)
 [node name="enemy_strawberry" parent="." instance=ExtResource("4_ee8bm")]
 position = Vector2(-130, -4)
 scale = Vector2(2, 2)
+
+[node name="Player" parent="." instance=ExtResource("13_0wqet")]

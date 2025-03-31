@@ -12,16 +12,16 @@ var experience_level = 1
 var collected_experience = 0
 
 #Attacks
-var iceSpear = preload("res://Player/Attack/chef_small_knife.tscn")
+var chef_small_knife = preload("res://Player/Attack/chef_small_knife.tscn")
 var tornado = preload("res://Player/Attack/tornado.tscn")
-var javelin = preload("res://Player/Attack/chef_scissor.tscn")
+var chef_scissor = preload("res://Player/Attack/chef_scissor.tscn")
 
 #AttackNodes
-@onready var iceSpearTimer = get_node("%IceSpearTimer")
-@onready var iceSpearAttackTimer = get_node("%IceSpearAttackTimer")
+@onready var chef_small_knifeTimer = get_node("%chef_small_knifeTimer")
+@onready var chef_small_knifeAttackTimer = get_node("%chef_small_knifeAttackTimer")
 @onready var tornadoTimer = get_node("%TornadoTimer")
 @onready var tornadoAttackTimer = get_node("%TornadoAttackTimer")
-@onready var javelinBase = get_node("%JavelinBase")
+@onready var chef_scissorBase = get_node("%chef_scissorBase")
 
 #UPGRADES
 var collected_upgrades = []
@@ -32,11 +32,11 @@ var spell_cooldown = 0
 var spell_size = 0
 var additional_attacks = 0
 
-#IceSpear
-var icespear_ammo = 0
-var icespear_baseammo = 0
-var icespear_attackspeed = 1.5
-var icespear_level = 0
+#chef_small_knife
+var chef_small_knife_ammo = 0
+var chef_small_knife_baseammo = 0
+var chef_small_knife_attackspeed = 1.5
+var chef_small_knife_level = 0
 
 #Tornado
 var tornado_ammo = 0
@@ -44,9 +44,9 @@ var tornado_baseammo = 0
 var tornado_attackspeed = 3
 var tornado_level = 0
 
-#Javelin
-var javelin_ammo = 0
-var javelin_level = 0
+#chef_scissor
+var chef_scissor_ammo = 0
+var chef_scissor_level = 0
 
 
 #Enemy Related
@@ -78,7 +78,7 @@ var enemy_close = []
 signal playerdeath
 
 func _ready():
-	upgrade_character("icespear1")
+	upgrade_character("chef_small_knife1")
 	attack()
 	set_expbar(experience, calculate_experiencecap())
 	_on_hurt_box_hurt(0,0,0)
@@ -108,16 +108,16 @@ func movement():
 	move_and_slide()
 
 func attack():
-	if icespear_level > 0:
-		iceSpearTimer.wait_time = icespear_attackspeed * (1-spell_cooldown)
-		if iceSpearTimer.is_stopped():
-			iceSpearTimer.start()
+	if chef_small_knife_level > 0:
+		chef_small_knifeTimer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
+		if chef_small_knifeTimer.is_stopped():
+			chef_small_knifeTimer.start()
 	if tornado_level > 0:
 		tornadoTimer.wait_time = tornado_attackspeed * (1-spell_cooldown)
 		if tornadoTimer.is_stopped():
 			tornadoTimer.start()
-	if javelin_level > 0:
-		spawn_javelin()
+	if chef_scissor_level > 0:
+		spawn_chef_scissor()
 
 func _on_hurt_box_hurt(damage, _angle, _knockback):
 	hp -= clamp(damage-armor, 1.0, 999.0)
@@ -127,22 +127,22 @@ func _on_hurt_box_hurt(damage, _angle, _knockback):
 		death()
 
 func _on_ice_spear_timer_timeout():
-	icespear_ammo += icespear_baseammo + additional_attacks
-	iceSpearAttackTimer.start()
+	chef_small_knife_ammo += chef_small_knife_baseammo + additional_attacks
+	chef_small_knifeAttackTimer.start()
 
 
 func _on_ice_spear_attack_timer_timeout():
-	if icespear_ammo > 0:
-		var icespear_attack = iceSpear.instantiate()
-		icespear_attack.position = position
-		icespear_attack.target = get_random_target()
-		icespear_attack.level = icespear_level
-		add_child(icespear_attack)
-		icespear_ammo -= 1
-		if icespear_ammo > 0:
-			iceSpearAttackTimer.start()
+	if chef_small_knife_ammo > 0:
+		var chef_small_knife_attack = chef_small_knife.instantiate()
+		chef_small_knife_attack.position = position
+		chef_small_knife_attack.target = get_random_target()
+		chef_small_knife_attack.level = chef_small_knife_level
+		add_child(chef_small_knife_attack)
+		chef_small_knife_ammo -= 1
+		if chef_small_knife_ammo > 0:
+			chef_small_knifeAttackTimer.start()
 		else:
-			iceSpearAttackTimer.stop()
+			chef_small_knifeAttackTimer.stop()
 
 func _on_tornado_timer_timeout():
 	tornado_ammo += tornado_baseammo + additional_attacks
@@ -161,19 +161,19 @@ func _on_tornado_attack_timer_timeout():
 		else:
 			tornadoAttackTimer.stop()
 
-func spawn_javelin():
-	var get_javelin_total = javelinBase.get_child_count()
-	var calc_spawns = (javelin_ammo + additional_attacks) - get_javelin_total
+func spawn_chef_scissor():
+	var get_chef_scissor_total = chef_scissorBase.get_child_count()
+	var calc_spawns = (chef_scissor_ammo + additional_attacks) - get_chef_scissor_total
 	while calc_spawns > 0:
-		var javelin_spawn = javelin.instantiate()
-		javelin_spawn.global_position = global_position
-		javelinBase.add_child(javelin_spawn)
+		var chef_scissor_spawn = chef_scissor.instantiate()
+		chef_scissor_spawn.global_position = global_position
+		chef_scissorBase.add_child(chef_scissor_spawn)
 		calc_spawns -= 1
-	#Upgrade Javelin
-	var get_javelins = javelinBase.get_children()
-	for i in get_javelins:
-		if i.has_method("update_javelin"):
-			i.update_javelin()
+	#Upgrade chef_scissor
+	var get_chef_scissors = chef_scissorBase.get_children()
+	for i in get_chef_scissors:
+		if i.has_method("update_chef_scissor"):
+			i.update_chef_scissor()
 
 func get_random_target():
 	if enemy_close.size() > 0:
@@ -248,17 +248,17 @@ func levelup():
 
 func upgrade_character(upgrade):
 	match upgrade:
-		"icespear1":
-			icespear_level = 1
-			icespear_baseammo += 1
-		"icespear2":
-			icespear_level = 2
-			icespear_baseammo += 1
-		"icespear3":
-			icespear_level = 3
-		"icespear4":
-			icespear_level = 4
-			icespear_baseammo += 2
+		"chef_small_knife1":
+			chef_small_knife_level = 1
+			chef_small_knife_baseammo += 1
+		"chef_small_knife2":
+			chef_small_knife_level = 2
+			chef_small_knife_baseammo += 1
+		"chef_small_knife3":
+			chef_small_knife_level = 3
+		"chef_small_knife4":
+			chef_small_knife_level = 4
+			chef_small_knife_baseammo += 2
 		"tornado1":
 			tornado_level = 1
 			tornado_baseammo += 1
@@ -271,15 +271,15 @@ func upgrade_character(upgrade):
 		"tornado4":
 			tornado_level = 4
 			tornado_baseammo += 1
-		"javelin1":
-			javelin_level = 1
-			javelin_ammo = 1
-		"javelin2":
-			javelin_level = 2
-		"javelin3":
-			javelin_level = 3
-		"javelin4":
-			javelin_level = 4
+		"chef_scissor1":
+			chef_scissor_level = 1
+			chef_scissor_ammo = 1
+		"chef_scissor2":
+			chef_scissor_level = 2
+		"chef_scissor3":
+			chef_scissor_level = 3
+		"chef_scissor4":
+			chef_scissor_level = 4
 		"armor1","armor2","armor3","armor4":
 			armor += 1
 		"speed1","speed2","speed3","speed4":

@@ -1,17 +1,17 @@
-[gd_scene load_steps=18 format=3 uid="uid://bplxtg3s6fbo3"]
+[gd_scene load_steps=18 format=3 uid="uid://d3l66ee14h740"]
 
-[ext_resource type="Script" uid="uid://dvbyqhk4ptqet" path="res://Player/player_chef.gd" id="1_7s6ib"]
-[ext_resource type="Texture2D" uid="uid://dl1keychiww6p" path="res://Textures/Player/player_Chef_sprite.png" id="2_7s6ib"]
-[ext_resource type="PackedScene" uid="uid://xy3cvpwdy828" path="res://Utility/hurt_box.tscn" id="3_ktosa"]
-[ext_resource type="Texture2D" uid="uid://dx7xx6vfahxlq" path="res://Textures/GUI/exp_background.png" id="4_8mvcx"]
-[ext_resource type="Texture2D" uid="uid://dlx33roiu0vlj" path="res://Textures/GUI/exp_progress.png" id="5_f84bu"]
-[ext_resource type="FontFile" uid="uid://cb4e8g30xxp5u" path="res://Font/tenderness.otf" id="6_g5s6r"]
-[ext_resource type="Texture2D" uid="uid://cj6a5rhwov14" path="res://Textures/GUI/healthbar.png" id="7_gqbgf"]
-[ext_resource type="Texture2D" uid="uid://da53mspvqfxq4" path="res://Textures/GUI/health.png" id="8_bx7i6"]
-[ext_resource type="AudioStream" uid="uid://ul8hunj8tl2t" path="res://Audio/SoundEffect/levelup.ogg" id="9_flb22"]
-[ext_resource type="AudioStream" uid="uid://bnv76nm5171dn" path="res://Audio/SoundEffect/Victory.wav" id="10_5am8b"]
-[ext_resource type="AudioStream" uid="uid://ca6physj6mqei" path="res://Audio/SoundEffect/Lose.ogg" id="11_5fldn"]
-[ext_resource type="PackedScene" uid="uid://b7c7gsdx2rkjm" path="res://Utility/basic_button.tscn" id="12_4muyn"]
+[ext_resource type="Script" uid="uid://bskfh1d7dgxwb" path="res://Player/player_test.gd" id="1_q4vxr"]
+[ext_resource type="Texture2D" uid="uid://doa3scrwgj2oq" path="res://Textures/Player/player_sprite.png" id="2_ycmgb"]
+[ext_resource type="PackedScene" uid="uid://xy3cvpwdy828" path="res://Utility/hurt_box.tscn" id="3_snoa8"]
+[ext_resource type="Texture2D" uid="uid://dx7xx6vfahxlq" path="res://Textures/GUI/exp_background.png" id="4_w0kcc"]
+[ext_resource type="Texture2D" uid="uid://dlx33roiu0vlj" path="res://Textures/GUI/exp_progress.png" id="5_nvvkq"]
+[ext_resource type="FontFile" uid="uid://cb4e8g30xxp5u" path="res://Font/tenderness.otf" id="6_4ky23"]
+[ext_resource type="Texture2D" uid="uid://cj6a5rhwov14" path="res://Textures/GUI/healthbar.png" id="7_0dd55"]
+[ext_resource type="Texture2D" uid="uid://da53mspvqfxq4" path="res://Textures/GUI/health.png" id="8_sxv65"]
+[ext_resource type="AudioStream" uid="uid://ul8hunj8tl2t" path="res://Audio/SoundEffect/levelup.ogg" id="9_u8vsn"]
+[ext_resource type="AudioStream" uid="uid://bnv76nm5171dn" path="res://Audio/SoundEffect/Victory.wav" id="10_e1w7s"]
+[ext_resource type="AudioStream" uid="uid://ca6physj6mqei" path="res://Audio/SoundEffect/Lose.ogg" id="11_yuvvf"]
+[ext_resource type="PackedScene" uid="uid://b7c7gsdx2rkjm" path="res://Utility/basic_button.tscn" id="12_a3dpp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nffdp"]
 radius = 8.0
@@ -28,16 +28,13 @@ radius = 50.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6vwp8"]
 
-[node name="player" type="CharacterBody2D" groups=["player"]]
+[node name="Player" type="CharacterBody2D" groups=["player"]]
 motion_mode = 1
-script = ExtResource("1_7s6ib")
+script = ExtResource("1_q4vxr")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(2, 2)
-texture = ExtResource("2_7s6ib")
-hframes = 4
-region_enabled = true
-region_rect = Rect2(16, 4, 64, 23)
+texture = ExtResource("2_ycmgb")
+hframes = 2
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
@@ -50,7 +47,7 @@ unique_name_in_owner = true
 wait_time = 0.2
 one_shot = true
 
-[node name="HurtBox" parent="." instance=ExtResource("3_ktosa")]
+[node name="HurtBox" parent="." instance=ExtResource("3_snoa8")]
 collision_mask = 2
 HurtBoxType = 2
 
@@ -60,15 +57,23 @@ shape = SubResource("RectangleShape2D_yfi4i")
 
 [node name="Attack" type="Node2D" parent="."]
 
-[node name="KnifeSmallTimer" type="Timer" parent="Attack"]
+[node name="chef_small_knifeTimer" type="Timer" parent="Attack"]
 unique_name_in_owner = true
 wait_time = 1.5
 
-[node name="KnifeSmallAttackTimer" type="Timer" parent="Attack/KnifeSmallTimer"]
+[node name="chef_small_knifeAttackTimer" type="Timer" parent="Attack/chef_small_knifeTimer"]
 unique_name_in_owner = true
 wait_time = 0.075
 
-[node name="KnifeBase" type="Node2D" parent="Attack"]
+[node name="TornadoTimer" type="Timer" parent="Attack"]
+unique_name_in_owner = true
+wait_time = 3.0
+
+[node name="TornadoAttackTimer" type="Timer" parent="Attack/TornadoTimer"]
+unique_name_in_owner = true
+wait_time = 0.2
+
+[node name="chef_scissorBase" type="Node2D" parent="Attack"]
 unique_name_in_owner = true
 
 [node name="EnemyDetectionArea" type="Area2D" parent="."]
@@ -106,8 +111,8 @@ unique_name_in_owner = true
 layout_mode = 0
 offset_right = 640.0
 offset_bottom = 40.0
-texture_under = ExtResource("4_8mvcx")
-texture_progress = ExtResource("5_f84bu")
+texture_under = ExtResource("4_w0kcc")
+texture_progress = ExtResource("5_nvvkq")
 
 [node name="lbl_level" type="Label" parent="GUILayer/GUI/ExperienceBar"]
 unique_name_in_owner = true
@@ -115,7 +120,7 @@ layout_mode = 0
 offset_left = 540.0
 offset_right = 640.0
 offset_bottom = 20.0
-theme_override_fonts/font = ExtResource("6_g5s6r")
+theme_override_fonts/font = ExtResource("6_4ky23")
 theme_override_font_sizes/font_size = 16
 text = "Level: 1"
 horizontal_alignment = 1
@@ -129,8 +134,8 @@ offset_top = 200.0
 offset_right = 336.0
 offset_bottom = 208.0
 value = 50.0
-texture_over = ExtResource("7_gqbgf")
-texture_progress = ExtResource("8_bx7i6")
+texture_over = ExtResource("7_0dd55")
+texture_progress = ExtResource("8_sxv65")
 
 [node name="LevelUp" type="Panel" parent="GUILayer/GUI"]
 unique_name_in_owner = true
@@ -146,7 +151,7 @@ offset_bottom = 300.0
 layout_mode = 0
 offset_right = 200.0
 offset_bottom = 50.0
-theme_override_fonts/font = ExtResource("6_g5s6r")
+theme_override_fonts/font = ExtResource("6_4ky23")
 text = "Level Up !"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -161,7 +166,7 @@ offset_bottom = 100.0
 
 [node name="snd_levelup" type="AudioStreamPlayer" parent="GUILayer/GUI/LevelUp"]
 unique_name_in_owner = true
-stream = ExtResource("9_flb22")
+stream = ExtResource("9_u8vsn")
 volume_db = -10.0
 
 [node name="DeathPanel" type="Panel" parent="GUILayer/GUI"]
@@ -179,22 +184,22 @@ unique_name_in_owner = true
 layout_mode = 0
 offset_right = 200.0
 offset_bottom = 50.0
-theme_override_fonts/font = ExtResource("6_g5s6r")
+theme_override_fonts/font = ExtResource("6_4ky23")
 text = "Result"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="snd_victory" type="AudioStreamPlayer" parent="GUILayer/GUI/DeathPanel"]
 unique_name_in_owner = true
-stream = ExtResource("10_5am8b")
+stream = ExtResource("10_e1w7s")
 volume_db = -10.0
 
 [node name="snd_lose" type="AudioStreamPlayer" parent="GUILayer/GUI/DeathPanel"]
 unique_name_in_owner = true
-stream = ExtResource("11_5fldn")
+stream = ExtResource("11_yuvvf")
 volume_db = -10.0
 
-[node name="btn_menu" parent="GUILayer/GUI/DeathPanel" instance=ExtResource("12_4muyn")]
+[node name="btn_menu" parent="GUILayer/GUI/DeathPanel" instance=ExtResource("12_a3dpp")]
 layout_mode = 0
 offset_left = 60.0
 offset_top = 200.0
@@ -209,7 +214,7 @@ offset_left = 280.0
 offset_top = 20.0
 offset_right = 360.0
 offset_bottom = 44.0
-theme_override_fonts/font = ExtResource("6_g5s6r")
+theme_override_fonts/font = ExtResource("6_4ky23")
 theme_override_font_sizes/font_size = 20
 text = "00:00"
 horizontal_alignment = 1
@@ -234,8 +239,10 @@ offset_bottom = 56.0
 columns = 10
 
 [connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]
-[connection signal="timeout" from="Attack/KnifeSmallTimer" to="." method="_on_knife_small_timer_timeout"]
-[connection signal="timeout" from="Attack/KnifeSmallTimer/KnifeSmallAttackTimer" to="." method="_on_knife_small_attack_timer_timeout"]
+[connection signal="timeout" from="Attack/chef_small_knifeTimer" to="." method="_on_ice_spear_timer_timeout"]
+[connection signal="timeout" from="Attack/chef_small_knifeTimer/chef_small_knifeAttackTimer" to="." method="_on_ice_spear_attack_timer_timeout"]
+[connection signal="timeout" from="Attack/TornadoTimer" to="." method="_on_tornado_timer_timeout"]
+[connection signal="timeout" from="Attack/TornadoTimer/TornadoAttackTimer" to="." method="_on_tornado_attack_timer_timeout"]
 [connection signal="body_entered" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_entered"]
 [connection signal="body_exited" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_exited"]
 [connection signal="area_entered" from="GrabArea" to="." method="_on_grab_area_area_entered"]
