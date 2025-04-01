@@ -35,6 +35,14 @@ func _ready():
 
 func _physics_process(delta):
 	if is_dead:
+		# 确保死亡状态下完全停止所有行为
+		velocity = Vector2.ZERO
+		# 禁用碰撞和伤害检测
+		set_collision_layer_value(1, false)
+		set_collision_mask_value(1, false)
+		if hitBox:
+			hitBox.set_collision_layer_value(2, false)
+			hitBox.set_collision_mask_value(2, false)
 		return
 		
 	# 状态计时
@@ -56,6 +64,16 @@ func _physics_process(delta):
 			# 检查是否应该退出防御状态
 			if state_timer >= current_state_duration:
 				exit_defense_state()
+
+	# 添加这个检查，防止动画频繁切换
+	if anim.current_animation == "hurt":
+		return  # 如果正在播放受伤动画，不要切换到其他动画
+		
+	# 确保动画与状态匹配
+	if current_state == State.DEFENSE and anim.current_animation != "defense":
+		anim.play("defense")
+	elif current_state == State.NORMAL and anim.current_animation != "walk" and anim.current_animation != "hurt":
+		anim.play("walk")
 
 # 进入防御状态
 func enter_defense_state():
@@ -98,34 +116,46 @@ func exit_defense_state():
 func reset_modulate():
 	sprite.modulate = original_modulate
 
-# 重写伤害处理函数，在防御状态下不受伤害但仍然检测碰撞
-func _on_hurt_box_hurt(damage, angle, knockback_amount):
-	if is_invincible:
-		# 播放防御音效或特效（如果有）
-		print("Cabbage处于防御状态，免疫伤害!")
-		
-		# 停止之前的计时器
-		#flash_timer.stop()
-		
-		# 闪烁效果
-		#sprite.modulate = Color(0.5, 0.5, 1.0, 1.0)  # 蓝色闪烁表示防御
-		
-		# 设置计时器恢复原始颜色
-		#flash_timer.wait_time = 0.1
-		#flash_timer.start()
-		
-		return
-		
-	# 正常状态下调用父类的伤害处理
-	super._on_hurt_box_hurt(damage, angle, knockback_amount)
-
-# 重写死亡函数，确保在死亡时退出防御状态
+# 重写死亡函数
 func death():
-	# 确保退出防御状态
+	if is_dead:
+		return  # 防止多次触发死亡
+		
+	is_dead = true
 	is_invincible = false
+	current_state = State.NORMAL  # 确保退出防御状态
+	
+	# 停止所有现有动画
+	if anim:
+		anim.stop()
+		anim.play("dead")
+	
+	# 禁用所有碰撞
+	set_collision_layer_value(1, false)
+	set_collision_mask_value(1, false)
+	if hitBox:
+		hitBox.set_collision_layer_value(2, false)
+		hitBox.set_collision_mask_value(2, false)
 	
 	# 恢复原始颜色
 	reset_modulate()
 	
-	# 调用父类的死亡函数
-	super.death()
+	# 等待死亡动画播放完成
+	if anim and anim.has_animation("dead"):
+		await anim.animation_finished
+		queue_free()
+	else:
+		queue_free()
+
+# 重写伤害处理函数
+func _on_hurt_box_hurt(damage, angle, knockback_amount):
+	if is_dead:
+		return  # 如果已经死亡，不再处理伤害
+		
+	if is_invincible:
+		# 播放防御音效或特效（如果有）
+		print("Cabbage处于防御状态，免疫伤害!")
+		return
+		
+	# 正常状态下调用父类的伤害处理
+	super._on_hurt_box_hurt(damage, angle, knockback_amount)

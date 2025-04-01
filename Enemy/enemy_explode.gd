@@ -16,6 +16,7 @@ var knockback = Vector2.ZERO
 @onready var anim = $AnimationPlayer
 @onready var snd_hit = $snd_hit
 @onready var hitBox = $HitBox
+@onready var damage_number_scene = preload("res://Utility/damage_number.tscn")
 
 var death_anim = preload("res://Enemy/explosion.tscn")
 var exp_gem = preload("res://Objects/experience_gem.tscn")
@@ -100,9 +101,9 @@ func _on_death_animation_finished(anim_name):
 		loot_base.call_deferred("add_child", new_gem)
 		
 		# 添加爆炸视觉效果
-		#var enemy_death = death_anim.instantiate()
-		#enemy_death.scale = sprite.scale
-		#enemy_death.global_position = global_position
+	#	var enemy_death = death_anim.instantiate()
+	#	enemy_death.scale = sprite.scale
+	#	enemy_death.global_position = global_position
 	#	get_parent().call_deferred("add_child", enemy_death)
 		
 		# 延长等待时间确保爆炸有足够时间处理
@@ -209,29 +210,52 @@ func _find_all_enemies(node, result):
 	for child in node.get_children():
 		_find_all_enemies(child, result)
 
-func _on_hurt_box_hurt(damage, angle, knockback_amount):
-	hp -= damage
-	knockback = angle * knockback_amount  # 设置击退值
+# 重写hurt回调函数，添加特殊行为
+func _on_hurt_box_hurt(damage_amount: float, direction: Vector2, knockback_amount: float) -> void:
+	# 调用基类的伤害处理
+	handle_hurt(damage_amount, direction, knockback_amount)
 	
-		# 在这里添加受伤变红效果 ↓↓↓
-	sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
-	await get_tree().create_timer(0.2).timeout
-	sprite.modulate = Color(1, 1, 1, 1)  # 恢复正常
+	# 添加额外的爆炸特效等特殊行为
+	if hp <= 0 and not is_dead:
+		# 爆炸相关的特殊代码
+		pass
+
+func handle_hurt(damage_amount: float, direction: Vector2, knockback_amount: float) -> void:
+	# 生成伤害数字
+	spawn_damage_number(damage_amount)
 	
+	# 处理伤害
+	hp -= damage_amount
+	knockback = direction * knockback_amount
+	
+	# 处理受伤效果
+	if sprite:
+		sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
+		await get_tree().create_timer(0.2).timeout
+		sprite.modulate = Color(1, 1, 1, 1)  # 恢复正常
+	
+	# 处理死亡或受伤动画
 	if hp <= 0:
-		if not is_dead:  # 防止多次调用
+		if not is_dead:
 			death()
 	else:
-		snd_hit.play()
+		if snd_hit:
+			snd_hit.play()
 		
-		# 播放受伤动画，并确保动画完成后恢复行走
-		if anim.has_animation("hurt") and anim.current_animation != "hurt":
+		if anim and anim.has_animation("hurt") and anim.current_animation != "hurt":
 			anim.play("hurt")
-			
-			# 如果没有连接动画完成信号，添加连接
-			if not anim.is_connected("animation_finished", _on_hurt_animation_finished):
-				anim.connect("animation_finished", _on_hurt_animation_finished)
-				
-func _on_hurt_animation_finished(anim_name):
-	if anim_name == "hurt" and not is_dead:
-		anim.play("walk")  # 受伤动画结束后恢复行走
+
+func spawn_damage_number(damage_amount: float, enable_crit: bool = true) -> void:
+	var damage_number = damage_number_scene.instantiate()
+	
+	# 添加随机偏移
+	var random_x = 0
+	var random_y = 0
+	damage_number.position = Vector2(random_x, random_y)
+	
+	# 处理暴击
+	var is_crit = enable_crit and randf() < 0.2
+	var final_damage = damage_amount * (2.0 if is_crit else 1.0)
+	
+	damage_number.setup(int(damage_amount))
+	add_child(damage_number)

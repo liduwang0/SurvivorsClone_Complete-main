@@ -14,6 +14,7 @@ var is_dead = false
 @onready var anim = $AnimationPlayer
 @onready var snd_hit = $snd_hit
 @onready var hitBox = $HitBox
+@onready var damage_number_scene = preload("res://Utility/damage_number.tscn")
 
 # 添加闪烁相关变量
 var original_modulate = Color(1, 1, 1, 1)
@@ -126,40 +127,48 @@ func _on_death_animation_finished(anim_name):
 		# 移除敌人
 		queue_free()
 
-func _on_hurt_box_hurt(damage_amount, knockback_direction, knockback_strength):
+# 封装伤害处理函数
+func handle_hurt(damage_amount: float, direction: Vector2, knockback_amount: float) -> void:
+	# 生成伤害数字
+	spawn_damage_number(damage_amount)
+	
+	# 处理伤害
 	hp -= damage_amount
-	# 打印调试信息
-	print("受到伤害! 方向: ", knockback_direction, " 强度: ", knockback_strength)
-	# 设置击退
-	knockback = knockback_direction * knockback_strength
+	knockback = direction * knockback_amount
 	
-	# 无论是否死亡，都先播放受伤效果
-	snd_hit.play()
+	# 处理受伤效果
+	if sprite:
+		sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
+		await get_tree().create_timer(0.2).timeout
+		sprite.modulate = Color(1, 1, 1, 1)  # 恢复正常
 	
-	# 添加红光闪烁效果
-	hit_flash_timer.stop()  # 停止之前的计时器
-	sprite.modulate = Color(1.5, 0.3, 0.3, 1.0)  # 红色闪烁
-	hit_flash_timer.wait_time = 0.15  # 闪烁持续0.15秒
-	hit_flash_timer.start()
-	
-	# 检查是否死亡
+	# 处理死亡或受伤动画
 	if hp <= 0:
-		if not is_dead:  # 防止多次调用
-			# 延迟一小段时间再调用death，让闪烁效果可见
-			await get_tree().create_timer(0.1).timeout
+		if not is_dead:
 			death()
 	else:
-		# 播放受伤动画，并确保动画完成后恢复行走
-		if anim.has_animation("hurt") and anim.current_animation != "hurt":
+		if snd_hit:
+			snd_hit.play()
+		
+		if anim and anim.has_animation("hurt") and anim.current_animation != "hurt":
 			anim.play("hurt")
-			
-			# 如果没有连接动画完成信号，添加连接
-			if not anim.is_connected("animation_finished", _on_hurt_animation_finished):
-				anim.connect("animation_finished", _on_hurt_animation_finished)
 
-func _on_hurt_animation_finished(anim_name):
-	if anim_name == "hurt" and not is_dead:
-		anim.play("walk")  # 受伤动画结束后恢复行走
+# 封装伤害数字生成函数
+func spawn_damage_number(damage_amount: float) -> void:
+	var damage_number = damage_number_scene.instantiate()
+	
+	# 减小偏移范围和高度
+	var random_x = 0
+	var random_y = 0
+	damage_number.position = Vector2(random_x, -15 + random_y)  # 降低到-15像素
+	
+	# 使用 setup 而不是 set_damage
+	damage_number.setup(int(damage_amount))
+	add_child(damage_number)
+
+# 修改原有的hurt回调函数
+func _on_hurt_box_hurt(damage_amount: float, direction: Vector2, knockback_amount: float) -> void:
+	handle_hurt(damage_amount, direction, knockback_amount)
 
 # 添加动画完成回调
 func _on_animation_finished(anim_name):
