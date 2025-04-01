@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://d365vmor6f3or"]
+
+[ext_resource type="Script" uid="uid://bplhby3uegy0p" path="res://Player/Attack/chef_pan.gd" id="1_whrsp"]
+[ext_resource type="Texture2D" uid="uid://cpwfoa30vr4sb" path="res://Textures/Items/Weapons/chef_pan.png" id="2_nnjvf"]
+[ext_resource type="AudioStream" uid="uid://cl3g2vts3nyt0" path="res://Audio/SoundEffect/ice.wav" id="3_orqca"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p4tiy"]
+size = Vector2(14.1421, 28.2843)
+
+[node name="chef_pan" type="Area2D" groups=["attack"]]
+top_level = true
+scale = Vector2(0.1, 0.1)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_whrsp")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(1.13687e-13, -1.13687e-13)
+texture = ExtResource("2_nnjvf")
+flip_h = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-5.96046e-07, -2.38419e-06)
+rotation = -0.785398
+shape = SubResource("RectangleShape2D_p4tiy")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+autostart = true
+
+[node name="snd_play" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_orqca")
+volume_db = -10.0
+pitch_scale = 5.0
+autoplay = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

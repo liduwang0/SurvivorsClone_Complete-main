@@ -283,5 +283,37 @@ const UPGRADES = {
 		"level": "N/A",
 		"prerequisite": [],
 		"type": "item"
+	},
+	"chef_pan1": {
+		"icon": WEAPON_PATH + "chef_pan.png",
+		"displayname": "Chef's Pan I",
+		"details": "A heavy pan that swats enemies",
+		"level": "Level: 1",
+		"prerequisite": [],
+		"type": "weapon"
+	},
+	"chef_pan2": {
+		"icon": WEAPON_PATH + "chef_pan.png",
+		"displayname": "Chef's Pan II",
+		"details": "Gain one more pan",
+		"level": "Level: 2",
+		"prerequisite": ["chef_pan1"],
+		"type": "weapon"
+	},
+	"chef_pan3": {
+		"icon": WEAPON_PATH + "chef_pan.png",
+		"displayname": "Chef's Pan III",
+		"details": "Pans swing 20% faster",
+		"level": "Level: 3",
+		"prerequisite": ["chef_pan2"],
+		"type": "weapon"
+	},
+	"chef_pan4": {
+		"icon": WEAPON_PATH + "chef_pan.png",
+		"displayname": "Chef's Pan IV",
+		"details": "Gain one more pan",
+		"level": "Level: 4",
+		"prerequisite": ["chef_pan3"],
+		"type": "weapon"
 	}
 }

@@ -16,6 +16,7 @@ var chef_small_knife = preload("res://Player/Attack/chef_small_knife.tscn")
 var tornado = preload("res://Player/Attack/tornado.tscn")
 var chef_scissor = preload("res://Player/Attack/chef_scissor.tscn")
 var chef_big_knife = preload("res://Player/Attack/chef_big_knife.tscn")
+var chef_pan = preload("res://Player/Attack/chef_pan.tscn")
 
 #AttackNodes
 @onready var chef_small_knifeTimer = get_node("%chef_small_knifeTimer")
@@ -38,6 +39,15 @@ var chef_small_knife_ammo = 0
 var chef_small_knife_baseammo = 0
 var chef_small_knife_attackspeed = 1.5
 var chef_small_knife_level = 0
+
+#chef_pan
+var chef_pan_level = 0  # 修改初始值为0
+var chef_pan_ammo = 0
+var chef_pan_base_ammo = 2
+var chef_pan_attack_speed = 2.0
+var chef_pan_timer = 0.0
+@onready var chef_panBase = get_node("%chef_panBase")  # 如果使用场景中的节点
+#var chef_panBase: Node2D  # 如果要动态创建
 
 #Tornado
 var tornado_ammo = 0
@@ -89,10 +99,23 @@ var enemy_close = []
 #Signal
 signal playerdeath
 
-
+func spawn_chef_pan():
+	# 获取当前平底锅数量
+	var current_pans = chef_panBase.get_child_count()
+	
+	# 计算需要生成的平底锅数量（加上戒指效果）
+	var pans_to_spawn = (chef_pan_ammo + additional_attacks) - current_pans
+	
+	# 同时生成多个平底锅
+	while pans_to_spawn > 0:
+		var chef_pan_spawn = chef_pan.instantiate()
+		chef_pan_spawn.global_position = global_position
+		chef_panBase.add_child(chef_pan_spawn)
+		pans_to_spawn -= 1
 
 func _ready():
 	upgrade_character("chef_small_knife1")
+	#upgrade_character("chef_pan1")
 	attack()
 	set_expbar(experience, calculate_experiencecap())
 	_on_hurt_box_hurt(0,0,0)
@@ -103,6 +126,14 @@ func _physics_process(delta):
 	movement()
 	if chef_big_knife_level > 0:
 		update_rotating_knives()
+	
+	# Pan weapon update
+	if chef_pan_level > 0:
+		chef_pan_timer += delta
+		if chef_pan_timer >= chef_pan_attack_speed * (1-spell_cooldown):
+			chef_pan_timer = 0
+			if chef_pan_ammo > 0:
+				spawn_chef_pan()
 
 func _process(delta):
 	# 如果有旋转刀，更新它们的位置
@@ -299,6 +330,24 @@ func levelup():
 
 func upgrade_character(upgrade):
 	match upgrade:
+		
+		"chef_pan1":
+			chef_pan_level = 1
+			chef_pan_base_ammo = 1
+			chef_pan_ammo = chef_pan_base_ammo
+		"chef_pan2":
+			chef_pan_level = 2
+			chef_pan_base_ammo = 2
+			chef_pan_ammo = chef_pan_base_ammo
+		"chef_pan3":
+			chef_pan_level = 3
+			chef_pan_attack_speed *= 0.8
+			chef_pan_base_ammo = 3
+			chef_pan_ammo = chef_pan_base_ammo
+		"chef_pan4":
+			chef_pan_level = 4
+			chef_pan_base_ammo = 4
+			chef_pan_ammo = chef_pan_base_ammo
 		"chef_small_knife1":
 			chef_small_knife_level = 1
 			chef_small_knife_baseammo += 1
@@ -351,28 +400,28 @@ func upgrade_character(upgrade):
 			knife_count = 2
 			knife_damage = 1
 			knife_distance = 70
-			rotation_speed = -2.0
+			rotation_speed = -0.6
 			initialize_rotating_knives()
 		"chef_big_knife2":
 			chef_big_knife_level = 2
 			knife_count = 3
 			knife_damage = 2
 			knife_distance = 80
-			rotation_speed = -2.2
+			rotation_speed = -0.6
 			initialize_rotating_knives()
 		"chef_big_knife3":
 			chef_big_knife_level = 3
 			knife_count = 4
 			knife_damage = 3
 			knife_distance = 90
-			rotation_speed = -2.4
+			rotation_speed = -0.8
 			initialize_rotating_knives()
 		"chef_big_knife4":
 			chef_big_knife_level = 4
 			knife_count = 5
 			knife_damage = 4
 			knife_distance = 100
-			rotation_speed = -2.6
+			rotation_speed = -1.0
 			initialize_rotating_knives()
 	adjust_gui_collection(upgrade)
 	attack()
@@ -521,6 +570,27 @@ func upgrade_knife():
 			knife_damage = 0.3
 			knife_distance = 90
 			rotation_speed = -2.4
-	
+
 	# 重新初始化旋转刀
 	initialize_rotating_knives()
+
+func upgrade_chef_pan():
+	chef_pan_level += 1
+	match chef_pan_level:
+		1:
+			chef_pan_base_ammo = 1
+			chef_pan_ammo = chef_pan_base_ammo + additional_attacks  # 加上戒指效果
+		2:
+			chef_pan_base_ammo = 2
+			chef_pan_ammo = chef_pan_base_ammo + additional_attacks
+		3:
+			chef_pan_base_ammo = 3
+			chef_pan_ammo = chef_pan_base_ammo + additional_attacks
+		4:
+			chef_pan_base_ammo = 4
+			chef_pan_ammo = chef_pan_base_ammo + additional_attacks
+	
+	# 更新攻击速度
+	if chef_pan_timer:
+		chef_pan_timer.wait_time = chef_pan_attack_speed
+		chef_pan_timer.start()
