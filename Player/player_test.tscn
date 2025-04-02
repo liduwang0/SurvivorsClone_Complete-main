@@ -65,11 +65,11 @@ wait_time = 1.5
 unique_name_in_owner = true
 wait_time = 0.075
 
-[node name="TornadoTimer" type="Timer" parent="Attack"]
+[node name="chef_rolling_pinTimer" type="Timer" parent="Attack"]
 unique_name_in_owner = true
 wait_time = 3.0
 
-[node name="TornadoAttackTimer" type="Timer" parent="Attack/TornadoTimer"]
+[node name="chef_rolling_pinAttackTimer" type="Timer" parent="Attack/chef_rolling_pinTimer"]
 unique_name_in_owner = true
 wait_time = 0.2
 
@@ -248,8 +248,8 @@ columns = 10
 [connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]
 [connection signal="timeout" from="Attack/chef_small_knifeTimer" to="." method="_on_ice_spear_timer_timeout"]
 [connection signal="timeout" from="Attack/chef_small_knifeTimer/chef_small_knifeAttackTimer" to="." method="_on_ice_spear_attack_timer_timeout"]
-[connection signal="timeout" from="Attack/TornadoTimer" to="." method="_on_tornado_timer_timeout"]
-[connection signal="timeout" from="Attack/TornadoTimer/TornadoAttackTimer" to="." method="_on_tornado_attack_timer_timeout"]
+[connection signal="timeout" from="Attack/chef_rolling_pinTimer" to="." method="_on_chef_rolling_pin_timer_timeout"]
+[connection signal="timeout" from="Attack/chef_rolling_pinTimer/chef_rolling_pinAttackTimer" to="." method="_on_chef_rolling_pin_attack_timer_timeout"]
 [connection signal="body_entered" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_entered"]
 [connection signal="body_exited" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_exited"]
 [connection signal="area_entered" from="GrabArea" to="." method="_on_grab_area_area_entered"]

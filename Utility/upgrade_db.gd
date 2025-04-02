@@ -68,36 +68,36 @@ const UPGRADES = {
 		"prerequisite": ["chef_scissor3"],
 		"type": "weapon"
 	},
-	"tornado1": {
-		"icon": WEAPON_PATH + "tornado.png",
-		"displayname": "Tornado",
-		"details": "A tornado is created and random heads somewhere in the players direction",
+	"chef_rolling_pin1": {
+		"icon": WEAPON_PATH + "chef_rolling_pin.png",
+		"displayname": "chef_rolling_pin",
+		"details": "A chef_rolling_pin is created and random heads somewhere in the players direction",
 		"level": "Level: 1",
 		"prerequisite": [],
 		"type": "weapon"
 	},
-	"tornado2": {
-		"icon": WEAPON_PATH + "tornado.png",
-		"displayname": "Tornado",
-		"details": "An additional Tornado is created",
+	"chef_rolling_pin2": {
+		"icon": WEAPON_PATH + "chef_rolling_pin.png",
+		"displayname": "chef_rolling_pin",
+		"details": "An additional chef_rolling_pin is created",
 		"level": "Level: 2",
-		"prerequisite": ["tornado1"],
+		"prerequisite": ["chef_rolling_pin1"],
 		"type": "weapon"
 	},
-	"tornado3": {
-		"icon": WEAPON_PATH + "tornado.png",
-		"displayname": "Tornado",
-		"details": "The Tornado cooldown is reduced by 0.5 seconds",
+	"chef_rolling_pin3": {
+		"icon": WEAPON_PATH + "chef_rolling_pin.png",
+		"displayname": "chef_rolling_pin",
+		"details": "The chef_rolling_pin cooldown is reduced by 0.5 seconds",
 		"level": "Level: 3",
-		"prerequisite": ["tornado2"],
+		"prerequisite": ["chef_rolling_pin2"],
 		"type": "weapon"
 	},
-	"tornado4": {
-		"icon": WEAPON_PATH + "tornado.png",
-		"displayname": "Tornado",
-		"details": "An additional tornado is created and the knockback is increased by 25%",
+	"chef_rolling_pin4": {
+		"icon": WEAPON_PATH + "chef_rolling_pin.png",
+		"displayname": "chef_rolling_pin",
+		"details": "An additional chef_rolling_pin is created and the knockback is increased by 25%",
 		"level": "Level: 4",
-		"prerequisite": ["tornado3"],
+		"prerequisite": ["chef_rolling_pin3"],
 		"type": "weapon"
 	},
 	"chef_big_knife1": {
