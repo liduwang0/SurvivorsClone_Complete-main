@@ -19,11 +19,11 @@ var chef_big_knife = preload("res://Player/Attack/chef_big_knife.tscn")
 var chef_pan = preload("res://Player/Attack/chef_pan.tscn")
 
 #AttackNodes
-@onready var chef_small_knifeTimer = get_node("%chef_small_knifeTimer")
-@onready var chef_small_knifeAttackTimer = get_node("%chef_small_knifeAttackTimer")
-@onready var chef_rolling_pinTimer = get_node("%chef_rolling_pinTimer")
-@onready var chef_rolling_pinAttackTimer = get_node("%chef_rolling_pinAttackTimer")
-@onready var chef_scissorBase = get_node("%chef_scissorBase")
+@onready var chef_small_knife_timer = get_node("%chef_small_knifeTimer")
+@onready var chef_small_knife_attack_timer = get_node("%chef_small_knifeAttackTimer")
+@onready var chef_rolling_pin_timer = get_node("%chef_rolling_pinTimer")
+@onready var chef_rolling_pin_attack_timer = get_node("%chef_rolling_pinAttackTimer")
+@onready var chef_scissor_base = get_node("%chef_scissorBase")
 
 #UPGRADES
 var collected_upgrades = []
@@ -41,12 +41,12 @@ var chef_small_knife_ammo = 0
 var chef_small_knife_attackspeed = 1.5
 
 #chef_pan
-var chef_pan_level = 0
+var chef_pan_level = 0  # 修改初始值为0
 var chef_pan_baseammo = 1
 var chef_pan_ammo = 0
 var chef_pan_attackspeed = 4
 var chef_pan_timer = 0.0
-@onready var chef_panBase = get_node("%chef_panBase")  # 如果使用场景中的节点
+@onready var chef_pan_base = get_node("%chef_panBase")  # 如果使用场景中的节点
 #var chef_panBase: Node2D  # 如果要动态创建
 
 #chef_rolling_pin
@@ -59,7 +59,7 @@ var chef_rolling_pin_attackspeed = 3
 var chef_scissor_level = 0
 var chef_scissor_baseammo = 1
 var chef_scissor_ammo = 0
-var chef_scissor_attackspeed = 2  # 添加攻击速度
+var chef_scissor_attackspeed = 2
 
 # 旋转菜刀相关属性
 var knife_count = 0
@@ -70,8 +70,6 @@ var knife_scale = Vector2(1, 1)
 var base_rotation = 0.0
 var knives = []
 var chef_big_knife_level = 0
-var chef_big_knife_count = 0  # 重命名为更明确的名称
-var chef_big_knife_distance = 70
 
 
 #Enemy Related
@@ -104,7 +102,7 @@ signal playerdeath
 
 func spawn_chef_pan():
 	# 获取当前平底锅数量
-	var current_pans = chef_panBase.get_child_count()
+	var current_pans = chef_pan_base.get_child_count()
 	
 	# 计算需要生成的平底锅数量（加上戒指效果）
 	var pans_to_spawn = (chef_pan_ammo + additional_attacks) - current_pans
@@ -113,7 +111,7 @@ func spawn_chef_pan():
 	while pans_to_spawn > 0:
 		var chef_pan_spawn = chef_pan.instantiate()
 		chef_pan_spawn.global_position = global_position
-		chef_panBase.add_child(chef_pan_spawn)
+		chef_pan_base.add_child(chef_pan_spawn)
 		pans_to_spawn -= 1
 
 func _ready():
@@ -127,14 +125,9 @@ func _ready():
 	if chef_big_knife_level > 0:
 		initialize_rotating_knives()
 	
-	# 手动连接擀面杖计时器信号
-	if chef_rolling_pinTimer:
-		if not chef_rolling_pinTimer.timeout.is_connected(Callable(self, "_on_chef_rolling_pin_timer_timeout")):
-			chef_rolling_pinTimer.timeout.connect(Callable(self, "_on_chef_rolling_pin_timer_timeout"))
 	
-	if chef_rolling_pinAttackTimer:
-		if not chef_rolling_pinAttackTimer.timeout.is_connected(Callable(self, "_on_chef_rolling_pin_attack_timer_timeout")):
-			chef_rolling_pinAttackTimer.timeout.connect(Callable(self, "_on_chef_rolling_pin_attack_timer_timeout"))
+	# 确保擀面杖初始弹药为0
+	chef_rolling_pin_ammo = 0
 
 func _physics_process(delta):
 	movement()
@@ -152,8 +145,8 @@ func _physics_process(delta):
 	# 添加擀面杖处理逻辑
 	if chef_rolling_pin_level > 0:
 		# 确保计时器已启动
-		if chef_rolling_pinTimer and chef_rolling_pinTimer.is_stopped():
-			chef_rolling_pinTimer.start()
+		if chef_rolling_pin_timer and chef_rolling_pin_timer.is_stopped():
+			chef_rolling_pin_timer.start()
 
 func _process(delta):
 	# 如果有旋转刀，更新它们的位置
@@ -182,18 +175,30 @@ func movement():
 	move_and_slide()
 
 func attack():
-	if chef_small_knife_level > 0 and chef_small_knifeTimer:
-		chef_small_knifeTimer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
-		if chef_small_knifeTimer.is_stopped():
-			chef_small_knifeTimer.start()
-	if chef_rolling_pin_level > 0 and chef_rolling_pinTimer:
-		chef_rolling_pinTimer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
-		# 确保计时器启动并打印调试信息
-		if chef_rolling_pinTimer.is_stopped():
-			print("启动擀面杖计时器，等级:", chef_rolling_pin_level)
-			chef_rolling_pinTimer.start()
+	# 小刀攻击
+	if chef_small_knife_level > 0 and chef_small_knife_timer:
+		chef_small_knife_timer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
+		if chef_small_knife_timer.is_stopped():
+			chef_small_knife_timer.start()
+	
+	# 擀面杖攻击
+	if chef_rolling_pin_level > 0 and chef_rolling_pin_timer:
+		chef_rolling_pin_timer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
+		if chef_rolling_pin_timer.is_stopped():
+			chef_rolling_pin_timer.start()
+	
+	# 剪刀攻击 - 添加计时器逻辑
 	if chef_scissor_level > 0:
+		# 这里可以考虑添加计时器，或保持直接生成
 		spawn_chef_scissor()
+	
+	# 平底锅攻击 - 添加计时器逻辑
+	if chef_pan_level > 0:
+		spawn_chef_pan()
+	
+	# 大刀攻击 - 在这里处理
+	if chef_big_knife_level > 0:
+		update_rotating_knives()
 
 func _on_hurt_box_hurt(damage, _angle, _knockback):
 	hp -= clamp(damage-armor, 1.0, 999.0)
@@ -202,12 +207,11 @@ func _on_hurt_box_hurt(damage, _angle, _knockback):
 	if hp <= 0:
 		death()
 
-func _on_ice_spear_timer_timeout():
+func _on_chef_small_knife_timer_timeout():
 	chef_small_knife_ammo += chef_small_knife_baseammo + additional_attacks
-	chef_small_knifeAttackTimer.start()
+	chef_small_knife_attack_timer.start()
 
-
-func _on_ice_spear_attack_timer_timeout():
+func _on_chef_small_knife_attack_timer_timeout():
 	if chef_small_knife_ammo > 0:
 		var chef_small_knife_attack = chef_small_knife.instantiate()
 		chef_small_knife_attack.position = position
@@ -216,30 +220,46 @@ func _on_ice_spear_attack_timer_timeout():
 		add_child(chef_small_knife_attack)
 		chef_small_knife_ammo -= 1
 		if chef_small_knife_ammo > 0:
-			chef_small_knifeAttackTimer.start()
+			chef_small_knife_attack_timer.start()
 		else:
-			chef_small_knifeAttackTimer.stop()
+			chef_small_knife_attack_timer.stop()
 
 func _on_chef_rolling_pin_timer_timeout():
+	# 基础弹药 + 额外攻击
 	chef_rolling_pin_ammo += chef_rolling_pin_baseammo + additional_attacks
-	chef_rolling_pinAttackTimer.start()
+	chef_rolling_pin_attack_timer.start()
+	
+	# 打印当前弹药数量，用于调试
+	print("擀面杖计时器触发，当前弹药:", chef_rolling_pin_ammo)
 
 func _on_chef_rolling_pin_attack_timer_timeout():
 	if chef_rolling_pin_ammo > 0:
+		# 打印当前弹药数量，用于调试
+		print("擀面杖攻击计时器触发，当前弹药:", chef_rolling_pin_ammo)
+		
+		# 确保last_movement不为零向量
+		var attack_direction = last_movement
+		if attack_direction == Vector2.ZERO:
+			attack_direction = Vector2.RIGHT
+		
+		# 生成擀面杖
 		var chef_rolling_pin_attack = chef_rolling_pin.instantiate()
 		chef_rolling_pin_attack.position = position
-		chef_rolling_pin_attack.last_movement = last_movement
-		chef_rolling_pin_attack.level = chef_rolling_pin_level
+		chef_rolling_pin_attack.angle = attack_direction
 		add_child(chef_rolling_pin_attack)
+		
+		# 减少弹药
 		chef_rolling_pin_ammo -= 1
+		
+		# 如果还有弹药，继续计时器
 		if chef_rolling_pin_ammo > 0:
-			chef_rolling_pinAttackTimer.start()
+			chef_rolling_pin_attack_timer.start()
 		else:
-			chef_rolling_pinAttackTimer.stop()
+			chef_rolling_pin_attack_timer.stop()
 
 func spawn_chef_scissor():
 	# 获取现有剪刀数量
-	var get_scissor_total = chef_scissorBase.get_child_count()
+	var get_scissor_total = chef_scissor_base.get_child_count()
 	print("现有剪刀数量:", get_scissor_total)
 	
 	# 计算需要添加的剪刀数量
@@ -250,11 +270,11 @@ func spawn_chef_scissor():
 	while calc_spawns > 0:
 		var chef_scissor_spawn = chef_scissor.instantiate()
 		chef_scissor_spawn.global_position = global_position
-		chef_scissorBase.add_child(chef_scissor_spawn)
+		chef_scissor_base.add_child(chef_scissor_spawn)
 		calc_spawns -= 1
 	
 	# 更新所有剪刀
-	var get_scissors = chef_scissorBase.get_children()
+	var get_scissors = chef_scissor_base.get_children()
 	for i in get_scissors:
 		# 直接设置剪刀的等级
 		i.level = chef_scissor_level
@@ -354,54 +374,37 @@ func upgrade_character(upgrade):
 	match upgrade:
 		
 		"chef_pan1":
-			chef_pan_level = 1
-			chef_pan_baseammo = 1
-			chef_pan_ammo = chef_pan_baseammo
+			upgrade_chef_pan(1)
 		"chef_pan2":
-			chef_pan_level = 2
-			chef_pan_baseammo = 2
-			chef_pan_ammo = chef_pan_baseammo
+			upgrade_chef_pan(2)
 		"chef_pan3":
-			chef_pan_level = 3
-			chef_pan_attackspeed *= 0.8
-			chef_pan_baseammo = 3
-			chef_pan_ammo = chef_pan_baseammo
+			upgrade_chef_pan(3)
 		"chef_pan4":
-			chef_pan_level = 4
-			chef_pan_baseammo = 4
-			chef_pan_ammo = chef_pan_baseammo
+			upgrade_chef_pan(4)
 		"chef_small_knife1":
-			chef_small_knife_level = 1
-			chef_small_knife_baseammo += 1
+			upgrade_chef_small_knife(1)
 		"chef_small_knife2":
-			chef_small_knife_level = 2
-			chef_small_knife_baseammo += 1
+			upgrade_chef_small_knife(2)
 		"chef_small_knife3":
-			chef_small_knife_level = 3
+			upgrade_chef_small_knife(3)
 		"chef_small_knife4":
-			chef_small_knife_level = 4
-			chef_small_knife_baseammo += 2
+			upgrade_chef_small_knife(4)
 		"chef_rolling_pin1":
-			chef_rolling_pin_level = 1
-			chef_rolling_pin_baseammo += 1
+			upgrade_chef_rolling_pin(1)
 		"chef_rolling_pin2":
-			chef_rolling_pin_level = 2
-			chef_rolling_pin_baseammo += 1
+			upgrade_chef_rolling_pin(2)
 		"chef_rolling_pin3":
-			chef_rolling_pin_level = 3
-			chef_rolling_pin_attackspeed -= 0.5
+			upgrade_chef_rolling_pin(3)
 		"chef_rolling_pin4":
-			chef_rolling_pin_level = 4
-			chef_rolling_pin_baseammo += 1
+			upgrade_chef_rolling_pin(4)
 		"chef_scissor1":
-			chef_scissor_level = 1
-			chef_scissor_ammo = 1
+			upgrade_chef_scissor(1)
 		"chef_scissor2":
-			chef_scissor_level = 2
+			upgrade_chef_scissor(2)
 		"chef_scissor3":
-			chef_scissor_level = 3
+			upgrade_chef_scissor(3)
 		"chef_scissor4":
-			chef_scissor_level = 4
+			upgrade_chef_scissor(4)
 		"armor1","armor2","armor3","armor4":
 			armor += 1
 		"speed1","speed2","speed3","speed4":
@@ -429,7 +432,7 @@ func upgrade_character(upgrade):
 			knife_count = 3
 			knife_damage = 2
 			knife_distance = 80
-			rotation_speed = -0.6
+			rotation_speed = -0.7
 			initialize_rotating_knives()
 		"chef_big_knife3":
 			chef_big_knife_level = 3
@@ -443,10 +446,10 @@ func upgrade_character(upgrade):
 			knife_count = 5
 			knife_damage = 4
 			knife_distance = 100
-			rotation_speed = -1.0
+			rotation_speed = -0.9
 			initialize_rotating_knives()
 		"chef_rolling_pin1", "chef_rolling_pin2", "chef_rolling_pin3", "chef_rolling_pin4":
-			upgrade_chef_rolling_pin()
+			upgrade_chef_rolling_pin(chef_rolling_pin_level + 1)
 	adjust_gui_collection(upgrade)
 	attack()
 	var option_children = upgradeOptions.get_children()
@@ -578,61 +581,126 @@ func update_rotating_knives():
 				knife.update_angle(global_position)
 				print("在 player_test.gd 中调用 update_angle")
 
-func upgrade_knife():
-	knife_count += 1
+func upgrade_chef_small_knife(target_level):
+	# 设置等级
+	chef_small_knife_level = target_level
 	
-	match knife_count:
-		2:
-			knife_damage = 0.1
-			knife_distance = 70
-			rotation_speed = -2.0
-		3:
-			knife_damage = 0.2
-			knife_distance = 80
-			rotation_speed = -2.2
-		4:
-			knife_damage = 0.3
-			knife_distance = 90
-			rotation_speed = -2.4
-
-	# 重新初始化旋转刀
-	initialize_rotating_knives()
-
-func upgrade_chef_pan():
-	chef_pan_level += 1
-	match chef_pan_level:
+	# 根据等级设置属性
+	match chef_small_knife_level:
 		1:
-			chef_pan_baseammo = 1
-			chef_pan_ammo = chef_pan_baseammo + additional_attacks  # 加上戒指效果
+			chef_small_knife_baseammo = 2  # 1 + 1
+			chef_small_knife_attackspeed = 1.5
 		2:
-			chef_pan_baseammo = 2
-			chef_pan_ammo = chef_pan_baseammo + additional_attacks
+			chef_small_knife_baseammo = 3  # 2 + 1
+			chef_small_knife_attackspeed = 1.4
 		3:
-			chef_pan_baseammo = 3
-			chef_pan_ammo = chef_pan_baseammo + additional_attacks
+			chef_small_knife_baseammo = 3  # 保持不变
+			chef_small_knife_attackspeed = 1.3
 		4:
-			chef_pan_baseammo = 4
-			chef_pan_ammo = chef_pan_baseammo + additional_attacks
-
-func upgrade_chef_rolling_pin():
-	chef_rolling_pin_level += 1
+			chef_small_knife_baseammo = 5  # 3 + 2
+			chef_small_knife_attackspeed = 1.2
 	
+	# 更新弹药和计时器
+	chef_small_knife_ammo = chef_small_knife_baseammo + additional_attacks
+	if chef_small_knife_timer:
+		chef_small_knife_timer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
+
+func upgrade_chef_rolling_pin(target_level):
+	# 设置等级
+	chef_rolling_pin_level = target_level
+	
+	# 根据等级设置属性
 	match chef_rolling_pin_level:
 		1:
 			chef_rolling_pin_baseammo = 1
 			chef_rolling_pin_attackspeed = 3.0
-			chef_rolling_pin_ammo = chef_rolling_pin_baseammo
 		2:
 			chef_rolling_pin_baseammo = 2
-			chef_rolling_pin_attackspeed = 2.8
-		3:
-			chef_rolling_pin_baseammo = 2
 			chef_rolling_pin_attackspeed = 2.5
-		4:
+		3:
 			chef_rolling_pin_baseammo = 3
 			chef_rolling_pin_attackspeed = 2.0
+		4:
+			chef_rolling_pin_baseammo = 4
+			chef_rolling_pin_attackspeed = 1.5
 	
-	# 更新计时器
-	if chef_rolling_pinTimer:
-		chef_rolling_pinTimer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
-		chef_rolling_pinTimer.start()
+	# 应用戒指效果
+	chef_rolling_pin_ammo = chef_rolling_pin_baseammo + additional_attacks
+	
+	# 确保计时器使用新的攻击速度
+	if chef_rolling_pin_timer:
+		chef_rolling_pin_timer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
+
+func upgrade_chef_pan(target_level):
+	# 设置等级
+	chef_pan_level = target_level
+	
+	# 根据等级设置属性
+	match chef_pan_level:
+		1:
+			chef_pan_baseammo = 1
+			chef_pan_attackspeed = 4.0
+		2:
+			chef_pan_baseammo = 2
+			chef_pan_attackspeed = 3.8
+		3:
+			chef_pan_baseammo = 3
+			chef_pan_attackspeed = 3.2  # 4.0 * 0.8
+		4:
+			chef_pan_baseammo = 4
+			chef_pan_attackspeed = 3.0
+	
+	# 应用戒指效果
+	chef_pan_ammo = chef_pan_baseammo + additional_attacks
+
+func upgrade_chef_scissor(target_level):
+	# 设置等级
+	chef_scissor_level = target_level
+	
+	# 根据等级设置属性
+	match chef_scissor_level:
+		1:
+			chef_scissor_baseammo = 1
+			chef_scissor_attackspeed = 2.0
+		2:
+			chef_scissor_baseammo = 1
+			chef_scissor_attackspeed = 1.8
+		3:
+			chef_scissor_baseammo = 2
+			chef_scissor_attackspeed = 1.6
+		4:
+			chef_scissor_baseammo = 2
+			chef_scissor_attackspeed = 1.4
+	
+	# 应用戒指效果
+	chef_scissor_ammo = chef_scissor_baseammo + additional_attacks
+
+func upgrade_chef_big_knife(target_level):
+	# 设置等级
+	chef_big_knife_level = target_level
+	
+	# 根据等级设置属性
+	match chef_big_knife_level:
+		1:
+			knife_count = 2
+			knife_damage = 1
+			knife_distance = 70
+			rotation_speed = -0.6
+		2:
+			knife_count = 3
+			knife_damage = 1.5
+			knife_distance = 80
+			rotation_speed = -0.7
+		3:
+			knife_count = 4
+			knife_damage = 2
+			knife_distance = 90
+			rotation_speed = -0.8
+		4:
+			knife_count = 5
+			knife_damage = 2.5
+			knife_distance = 100
+			rotation_speed = -0.9
+	
+	# 初始化旋转刀
+	initialize_rotating_knives()

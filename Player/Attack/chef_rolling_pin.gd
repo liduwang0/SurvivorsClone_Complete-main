@@ -55,15 +55,15 @@ func _ready():
 	# 设置初始速度
 	current_speed = speed
 	
-	# 直接使用最后移动方向
-	angle = last_movement.normalized()
+# 使用传入的angle参数，而不是last_movement
+	if angle != Vector2.ZERO:
+		angle = angle.normalized()
+	else:
+		# 如果没有提供角度，使用默认向右的方向
+		angle = Vector2.RIGHT
 	
-	# 根据移动方向设置旋转 - 修正45度偏移问题
-	# 不添加额外的PI/2或其他角度，直接使用方向向量的角度
+	# 根据移动方向设置旋转
 	rotation = angle.angle()
-	
-	# 打印调试信息
-	print("擀面杖方向: ", last_movement, " 角度: ", rotation)
 	
 	# 设置初始缩放
 	scale = Vector2(attack_size, attack_size)
