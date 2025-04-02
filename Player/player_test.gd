@@ -101,24 +101,35 @@ var enemy_close = []
 signal playerdeath
 
 func spawn_chef_pan():
-	# 获取当前平底锅数量
-	var current_pans = chef_pan_base.get_child_count()
-	
-	# 计算需要生成的平底锅数量（加上戒指效果）
-	var pans_to_spawn = (chef_pan_ammo + additional_attacks) - current_pans
-	
-	# 同时生成多个平底锅
-	while pans_to_spawn > 0:
-		var chef_pan_spawn = chef_pan.instantiate()
-		chef_pan_spawn.global_position = global_position
-		chef_pan_base.add_child(chef_pan_spawn)
-		pans_to_spawn -= 1
+	# 只在计时器触发时生成平底锅，而不是在升级时
+	if chef_pan_timer >= chef_pan_attackspeed * (1-spell_cooldown):
+		chef_pan_timer = 0
+		
+		# 获取当前平底锅数量
+		var current_pans = chef_pan_base.get_child_count()
+		
+		# 计算需要生成的平底锅数量（考虑额外攻击）
+		var target_pans = chef_pan_baseammo + additional_attacks
+		var pans_to_spawn = target_pans - current_pans
+		
+		# 确保不会生成负数的平底锅
+		pans_to_spawn = max(0, pans_to_spawn)
+		
+		# 打印调试信息
+		print("平底锅生成 - 当前:", current_pans, " 目标:", target_pans, " 需要生成:", pans_to_spawn)
+		
+		# 同时生成多个平底锅
+		while pans_to_spawn > 0:
+			var chef_pan_spawn = chef_pan.instantiate()
+			chef_pan_spawn.global_position = global_position
+			chef_pan_base.add_child(chef_pan_spawn)
+			pans_to_spawn -= 1
 
 func _ready():
 	#upgrade_character("chef_small_knife1")
 	# 添加这一行来测试擀面杖
-	upgrade_character("chef_rolling_pin1")
-	#upgrade_character("chef_pan1")
+	#upgrade_character("chef_rolling_pin1")
+	upgrade_character("chef_pan1")
 	attack()
 	set_expbar(experience, calculate_experiencecap())
 	_on_hurt_box_hurt(0,0,0)
@@ -128,6 +139,11 @@ func _ready():
 	
 	# 确保擀面杖初始弹药为0
 	chef_rolling_pin_ammo = 0
+	
+	# 确保所有武器的初始弹药为0
+	chef_small_knife_ammo = 0
+	chef_rolling_pin_ammo = 0
+	chef_scissor_ammo = 0
 
 func _physics_process(delta):
 	movement()
@@ -138,9 +154,7 @@ func _physics_process(delta):
 	if chef_pan_level > 0:
 		chef_pan_timer += delta
 		if chef_pan_timer >= chef_pan_attackspeed * (1-spell_cooldown):
-			chef_pan_timer = 0
-			if chef_pan_ammo > 0:
-				spawn_chef_pan()
+			spawn_chef_pan()
 	
 	# 添加擀面杖处理逻辑
 	if chef_rolling_pin_level > 0:
@@ -208,17 +222,29 @@ func _on_hurt_box_hurt(damage, _angle, _knockback):
 		death()
 
 func _on_chef_small_knife_timer_timeout():
+	# 增加基础弹药量 + 额外攻击
 	chef_small_knife_ammo += chef_small_knife_baseammo + additional_attacks
 	chef_small_knife_attack_timer.start()
+	
+	# 打印调试信息
+	print("小刀计时器触发，当前弹药:", chef_small_knife_ammo)
 
 func _on_chef_small_knife_attack_timer_timeout():
 	if chef_small_knife_ammo > 0:
+		# 打印调试信息
+		print("小刀攻击计时器触发，当前弹药:", chef_small_knife_ammo)
+		
+		# 生成小刀
 		var chef_small_knife_attack = chef_small_knife.instantiate()
 		chef_small_knife_attack.position = position
 		chef_small_knife_attack.target = get_random_target()
 		chef_small_knife_attack.level = chef_small_knife_level
 		add_child(chef_small_knife_attack)
+		
+		# 减少弹药
 		chef_small_knife_ammo -= 1
+		
+		# 如果还有弹药，继续计时器
 		if chef_small_knife_ammo > 0:
 			chef_small_knife_attack_timer.start()
 		else:
@@ -579,31 +605,39 @@ func update_rotating_knives():
 			# 必须调用 update_angle 更新击退方向
 			if knife.has_method("update_angle"):
 				knife.update_angle(global_position)
-				print("在 player_test.gd 中调用 update_angle")
+				#print("在 player_test.gd 中调用 update_angle")
 
-func upgrade_chef_small_knife(target_level):
+func upgrade_chef_small_knife(target_level = 0):
+	# 如果没有提供目标等级，则增加当前等级
+	if target_level == 0:
+		target_level = chef_small_knife_level + 1
+	
 	# 设置等级
 	chef_small_knife_level = target_level
 	
 	# 根据等级设置属性
 	match chef_small_knife_level:
 		1:
-			chef_small_knife_baseammo = 2  # 1 + 1
+			chef_small_knife_baseammo = 1  # 初始只有1个弹药
 			chef_small_knife_attackspeed = 1.5
 		2:
-			chef_small_knife_baseammo = 3  # 2 + 1
+			chef_small_knife_baseammo = 2
 			chef_small_knife_attackspeed = 1.4
 		3:
-			chef_small_knife_baseammo = 3  # 保持不变
+			chef_small_knife_baseammo = 3
 			chef_small_knife_attackspeed = 1.3
 		4:
-			chef_small_knife_baseammo = 5  # 3 + 2
+			chef_small_knife_baseammo = 4
 			chef_small_knife_attackspeed = 1.2
 	
-	# 更新弹药和计时器
-	chef_small_knife_ammo = chef_small_knife_baseammo + additional_attacks
+	# 更新计时器
 	if chef_small_knife_timer:
 		chef_small_knife_timer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
+		
+	# 打印调试信息
+	print("小刀升级到等级", chef_small_knife_level)
+	print("基础弹药:", chef_small_knife_baseammo)
+	print("额外攻击:", additional_attacks)
 
 func upgrade_chef_rolling_pin(target_level):
 	# 设置等级
@@ -631,7 +665,11 @@ func upgrade_chef_rolling_pin(target_level):
 	if chef_rolling_pin_timer:
 		chef_rolling_pin_timer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
 
-func upgrade_chef_pan(target_level):
+func upgrade_chef_pan(target_level = 0):
+	# 如果没有提供目标等级，则增加当前等级
+	if target_level == 0:
+		target_level = chef_pan_level + 1
+	
 	# 设置等级
 	chef_pan_level = target_level
 	
@@ -645,13 +683,18 @@ func upgrade_chef_pan(target_level):
 			chef_pan_attackspeed = 3.8
 		3:
 			chef_pan_baseammo = 3
-			chef_pan_attackspeed = 3.2  # 4.0 * 0.8
+			chef_pan_attackspeed = 3.2
 		4:
 			chef_pan_baseammo = 4
 			chef_pan_attackspeed = 3.0
 	
-	# 应用戒指效果
-	chef_pan_ammo = chef_pan_baseammo + additional_attacks
+	# 不再设置 chef_pan_ammo
+	# chef_pan_ammo = chef_pan_baseammo + additional_attacks
+	
+	# 打印调试信息
+	print("平底锅升级到等级", chef_pan_level)
+	print("基础弹药:", chef_pan_baseammo)
+	print("额外攻击:", additional_attacks)
 
 func upgrade_chef_scissor(target_level):
 	# 设置等级

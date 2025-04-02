@@ -108,7 +108,7 @@ func _on_death_animation_finished(anim_name):
 		
 		# 延长等待时间确保爆炸有足够时间处理
 	#	await get_tree().create_timer(0.6).timeout
-		print("番茄被移除")
+	#	print("番茄被移除")
 		queue_free()
 
 # 使用现有HitBox系统的爆炸伤害函数
@@ -133,13 +133,13 @@ func damage_nearby_enemies():
 	#print("============= 开始爆炸伤害调试 =============")
 	
 
-	print("============= 开始爆炸伤害调试 =============")
-	print("当前番茄位置:", global_position)
+	#print("============= 开始爆炸伤害调试 =============")
+	#print("当前番茄位置:", global_position)
 	
 	# 扫描场景中的其他敌人并直接伤害
 	var all_enemies = []
 	_find_all_enemies(get_tree().root, all_enemies)
-	print("找到", all_enemies.size(), "个敌人节点")
+	#print("找到", all_enemies.size(), "个敌人节点")
 	
 	# 直接对范围内的敌人造成伤害
 	var damaged_count = 0
@@ -150,8 +150,8 @@ func damage_nearby_enemies():
 		var distance = global_position.distance_to(enemy.global_position)
 		var in_range = distance <= explosion_radius
 		
-		print("检查敌人:", enemy.name)
-		print("  距离:", distance, " (在范围内: ", in_range, ")")
+		#print("检查敌人:", enemy.name)
+		#print("  距离:", distance, " (在范围内: ", in_range, ")")
 		
 		if in_range:
 			# 创建伤害方向（用于击退）
@@ -160,13 +160,13 @@ func damage_nearby_enemies():
 			# 直接调用敌人的伤害函数
 			if enemy.has_method("_on_hurt_box_hurt"):
 				enemy._on_hurt_box_hurt(explosion_damage, direction, 100)
-				print("  直接对敌人造成伤害:", explosion_damage)
+			#	print("  直接对敌人造成伤害:", explosion_damage)
 				damaged_count += 1
 	
-	print("成功直接伤害了", damaged_count, "个敌人")
+	#print("成功直接伤害了", damaged_count, "个敌人")
 	
 	# 同时创建爆炸HitBox用于伤害玩家
-	print("创建爆炸HitBox...")
+	#print("创建爆炸HitBox...")
 	var hitbox_scene = load("res://Utility/hit_box.tscn")
 	var explosion_hitbox = hitbox_scene.instantiate()
 	

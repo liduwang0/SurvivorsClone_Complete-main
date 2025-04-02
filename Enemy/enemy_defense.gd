@@ -94,7 +94,7 @@ func enter_defense_state():
 	# 设置无敌状态标志，但不禁用HurtBox
 	is_invincible = true
 	
-	print("Cabbage进入防御状态，持续", current_state_duration, "秒")
+#	print("Cabbage进入防御状态，持续", current_state_duration, "秒")
 
 # 退出防御状态
 func exit_defense_state():
@@ -110,7 +110,7 @@ func exit_defense_state():
 	# 取消无敌状态
 	is_invincible = false
 	
-	print("Cabbage退出防御状态，将行走", current_state_duration, "秒")
+#	print("Cabbage退出防御状态，将行走", current_state_duration, "秒")
 
 # 重置精灵颜色
 func reset_modulate():
@@ -154,7 +154,7 @@ func _on_hurt_box_hurt(damage, angle, knockback_amount):
 		
 	if is_invincible:
 		# 播放防御音效或特效（如果有）
-		print("Cabbage处于防御状态，免疫伤害!")
+	#	print("Cabbage处于防御状态，免疫伤害!")
 		return
 		
 	# 正常状态下调用父类的伤害处理

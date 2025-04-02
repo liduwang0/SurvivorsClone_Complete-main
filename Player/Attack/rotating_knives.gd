@@ -53,11 +53,7 @@ func update_knife_positions():
 			# 设置菜刀旋转
 			knives[i].rotation = angle + PI/2  # 调整菜刀朝向
 			
-			# 添加调试打印
-			print("旋转刀系统更新位置: ", i, " 旋转:", knives[i].rotation)
-			
 			# 确认是否调用了 update_angle
-			# 如果此处没有调用 update_angle，则需要添加:
 			if knives[i].has_method("update_angle"):
 				# 使用全局位置而不是局部位置
 				var player_pos = get_parent().global_position

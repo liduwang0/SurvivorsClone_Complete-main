@@ -21,12 +21,12 @@ func update_angle(player_position):
 	if new_angle.length() < 0.1:
 		new_angle = Vector2.RIGHT  # 防止零向量
 	
-	# 强制调试打印
-	print(">>>>>> 更新菜刀角度 <<<<<< ID:", get_instance_id())
-	print("原始角度:", angle)
-	print("新角度:", new_angle)
-	print("菜刀位置:", global_position)
-	print("玩家位置:", player_position)
+	# 注释掉或删除以下调试打印
+	# print(">>>>>> 更新菜刀角度 <<<<<< ID:", get_instance_id())
+	# print("原始角度:", angle)
+	# print("新角度:", new_angle)
+	# print("菜刀位置:", global_position)
+	# print("玩家位置:", player_position)
 	
 	# 设置新的角度
 	angle = new_angle
