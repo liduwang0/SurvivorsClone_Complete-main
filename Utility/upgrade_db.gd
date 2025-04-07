@@ -100,6 +100,14 @@ const UPGRADES = {
 		"prerequisite": ["chef_rolling_pin3"],
 		"type": "weapon"
 	},
+	"chef_rolling_pin5": {
+		"icon": WEAPON_PATH + "chef_rolling_pin.png",
+		"displayname": "chef_rolling_pin",
+		"details": "An additional chef_rolling_pin is created and the knockback is increased by 25%",
+		"level": "Level: 5",
+		"prerequisite": ["chef_rolling_pin4"],
+		"type": "weapon"
+	},
 	"chef_big_knife1": {
 		"icon": WEAPON_PATH + "chef_big_knife.png",
 		"displayname": "Rotating Knife",

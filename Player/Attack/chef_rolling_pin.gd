@@ -51,6 +51,13 @@ func _ready():
 			damage = 11
 			knockback_amount = 160
 			attack_size = 1.3 * (1 + player.spell_size)
+		5:
+			hp = 9999
+			speed = 90.0
+			max_speed = 350.0
+			damage = 13
+			knockback_amount = 180
+			attack_size = 1.4 * (1 + player.spell_size)
 	
 	# 设置初始速度
 	current_speed = speed

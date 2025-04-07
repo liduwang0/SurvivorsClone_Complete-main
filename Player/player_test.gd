@@ -268,11 +268,23 @@ func _on_chef_rolling_pin_attack_timer_timeout():
 		if attack_direction == Vector2.ZERO:
 			attack_direction = Vector2.RIGHT
 		
-		# 生成擀面杖
-		var chef_rolling_pin_attack = chef_rolling_pin.instantiate()
-		chef_rolling_pin_attack.position = position
-		chef_rolling_pin_attack.angle = attack_direction
-		add_child(chef_rolling_pin_attack)
+		# 检查是否是第5级，需要朝四个方向发射
+		if chef_rolling_pin_level == 5:
+			# 朝四个方向发射擀面杖
+			var directions = [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]
+			for direction in directions:
+				var chef_rolling_pin_attack = chef_rolling_pin.instantiate()
+				chef_rolling_pin_attack.position = position
+				chef_rolling_pin_attack.angle = direction
+				chef_rolling_pin_attack.level = chef_rolling_pin_level
+				add_child(chef_rolling_pin_attack)
+		else:
+			# 正常朝一个方向发射
+			var chef_rolling_pin_attack = chef_rolling_pin.instantiate()
+			chef_rolling_pin_attack.position = position
+			chef_rolling_pin_attack.angle = attack_direction
+			chef_rolling_pin_attack.level = chef_rolling_pin_level
+			add_child(chef_rolling_pin_attack)
 		
 		# 减少弹药
 		chef_rolling_pin_ammo -= 1
@@ -423,6 +435,8 @@ func upgrade_character(upgrade):
 			upgrade_chef_rolling_pin(3)
 		"chef_rolling_pin4":
 			upgrade_chef_rolling_pin(4)
+		"chef_rolling_pin5":
+			upgrade_chef_rolling_pin(5)
 		"chef_scissor1":
 			upgrade_chef_scissor(1)
 		"chef_scissor2":
@@ -657,6 +671,9 @@ func upgrade_chef_rolling_pin(target_level):
 		4:
 			chef_rolling_pin_baseammo = 4
 			chef_rolling_pin_attackspeed = 1.5
+		5:
+			chef_rolling_pin_baseammo = 1  # 第5级只需要1个基础弹药，因为会向四个方向发射
+			chef_rolling_pin_attackspeed = 1.2
 	
 	# 应用戒指效果
 	chef_rolling_pin_ammo = chef_rolling_pin_baseammo + additional_attacks
