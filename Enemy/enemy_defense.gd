@@ -125,6 +125,9 @@ func death():
 	is_invincible = false
 	current_state = State.NORMAL  # 确保退出防御状态
 	
+	# 发出信号，以便从敌人数组中移除
+	emit_signal("remove_from_array", self)
+	
 	# 停止所有现有动画
 	if anim:
 		anim.stop()
@@ -140,11 +143,24 @@ func death():
 	# 恢复原始颜色
 	reset_modulate()
 	
-	# 等待死亡动画播放完成
+	# 等待死亡动画播放完成，然后生成经验宝石
 	if anim and anim.has_animation("dead"):
 		await anim.animation_finished
+		
+		# 生成经验宝石
+		var new_gem = exp_gem.instantiate()
+		new_gem.global_position = global_position
+		new_gem.experience = experience
+		loot_base.call_deferred("add_child", new_gem)
+		
 		queue_free()
 	else:
+		# 如果没有死亡动画，直接生成经验宝石
+		var new_gem = exp_gem.instantiate()
+		new_gem.global_position = global_position
+		new_gem.experience = experience
+		loot_base.call_deferred("add_child", new_gem)
+		
 		queue_free()
 
 # 重写伤害处理函数
