@@ -1,27 +1,28 @@
-[gd_scene load_steps=5 format=3 uid="uid://c5uacm25vr0aj"]
+[gd_scene load_steps=5 format=3 uid="uid://dxjqsx01ymwlu"]
 
-[ext_resource type="Script" uid="uid://j10a8kbvvale" path="res://Player/Attack/chef_rolling_pin.gd" id="1_wnjow"]
-[ext_resource type="Texture2D" uid="uid://b5s5ckurx1jpq" path="res://Textures/Items/Weapons/chef_rolling_pin.png" id="2_vfb0l"]
-[ext_resource type="AudioStream" uid="uid://cl3g2vts3nyt0" path="res://Audio/SoundEffect/ice.wav" id="3_37tmk"]
+[ext_resource type="Script" uid="uid://duqutd3fp5nyk" path="res://Player/Attack/ninja_kunai.gd" id="1_petdl"]
+[ext_resource type="Texture2D" uid="uid://bhlaxwb34entj" path="res://Textures/Items/Ninja_weaponse/ninja_kunai.png" id="2_petdl"]
+[ext_resource type="AudioStream" uid="uid://cl3g2vts3nyt0" path="res://Audio/SoundEffect/ice.wav" id="3_kor88"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p4tiy"]
 size = Vector2(12.1976, 42.4264)
 
-[node name="chef_rolling_pin" type="Area2D" groups=["attack"]]
+[node name="ninja_kunai" type="Area2D" groups=["attack"]]
 top_level = true
 scale = Vector2(0.1, 0.1)
 collision_layer = 4
 collision_mask = 0
-script = ExtResource("1_wnjow")
+script = ExtResource("1_petdl")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(9.53674e-07, -9.53674e-07)
-rotation = -0.785398
-texture = ExtResource("2_vfb0l")
+rotation = 3.14159
+texture = ExtResource("2_petdl")
 flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0.687499, -0.687499)
+position = Vector2(0.687501, -0.687501)
+rotation = -0.785398
 shape = SubResource("RectangleShape2D_p4tiy")
 
 [node name="Timer" type="Timer" parent="."]
@@ -30,7 +31,7 @@ one_shot = true
 autostart = true
 
 [node name="snd_play" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_37tmk")
+stream = ExtResource("3_kor88")
 volume_db = -10.0
 pitch_scale = 5.0
 autoplay = true
