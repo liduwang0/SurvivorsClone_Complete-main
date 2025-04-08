@@ -58,7 +58,7 @@ shape = SubResource("RectangleShape2D_yfi4i")
 
 [node name="ninja_kunai_Timer" type="Timer" parent="Attack"]
 unique_name_in_owner = true
-wait_time = 1.5
+wait_time = 0.001
 
 [node name="ninja_kunai_AttackTimer" type="Timer" parent="Attack/ninja_kunai_Timer"]
 unique_name_in_owner = true

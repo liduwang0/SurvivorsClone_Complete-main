@@ -1,5 +1,12 @@
 extends CharacterBody2D
 
+#初始化时启动攻击：
+#在 _ready() 函数中调用 attack()，是为了确保角色一开始就能使用武器攻击。这样一旦游戏开始，玩家就不需要等待第一次攻击计时器完成。
+#升级后重新配置攻击：
+#在 upgrade_character() 函数结束时调用 attack()，是为了在玩家升级武器后立即应用新的攻击参数。比如，当你的苦无升级到更高级别时，攻击速度会变快，通过在升级后调用 attack()，可以立即重置计时器使用新的攻击速度。
+
+
+
 var movement_speed = 100.0
 var hp = 800
 var maxhp = 800
@@ -30,7 +37,8 @@ var additional_attacks = 0
 var kunai_level = 0
 var kunai_baseammo = 1
 var kunai_ammo = 0
-var kunai_attackspeed = 1.5
+var kunai_reload_time = 2.0  # 换弹需要2秒
+var kunai_fire_interval = 0.2  # 连发间隔0.2秒
 
 #Enemy Related
 var enemy_close = []
@@ -43,13 +51,13 @@ var enemy_close = []
 @onready var lblLevel = get_node("%lbl_level")
 @onready var levelPanel = get_node("%LevelUp")
 @onready var upgradeOptions = get_node("%UpgradeOptions")
-@onready var itemOptions = preload("res://Utility/item_option.tscn")
+@onready var itemOptions = preload("res://Utility/item_option_ninja.tscn")
 @onready var sndLevelUp = get_node("%snd_levelup")
 @onready var healthBar = get_node("%HealthBar")
 @onready var lblTimer = get_node("%lblTimer")
 @onready var collectedWeapons = get_node("%CollectedWeapons")
 @onready var collectedUpgrades = get_node("%CollectedUpgrades")
-@onready var itemContainer = preload("res://Player/GUI/item_container.tscn")
+@onready var itemContainer = preload("res://Player/GUI/item_container_ninja.tscn")
 
 @onready var deathPanel = get_node("%DeathPanel")
 @onready var lblResult = get_node("%lbl_Result")
@@ -60,9 +68,6 @@ var enemy_close = []
 signal playerdeath
 
 func _ready():
-	# 将角色添加到 Player_ninja 组
-	add_to_group("Player_ninja")
-	
 	upgrade_character("ninja_kunai1")
 	attack()
 	set_expbar(experience, calculate_experiencecap())
@@ -101,7 +106,7 @@ func movement():
 func attack():
 	# kunai攻击
 	if kunai_level > 0 and kunai_timer:
-		kunai_timer.wait_time = kunai_attackspeed * (1-spell_cooldown)
+		kunai_timer.wait_time = kunai_reload_time * (1-spell_cooldown)
 		if kunai_timer.is_stopped():
 			kunai_timer.start()
 
@@ -113,13 +118,17 @@ func _on_hurt_box_hurt(damage, _angle, _knockback):
 		death()
 
 func _on_kunai_timer_timeout():
-	# 增加基础弹药量 + 额外攻击
-	kunai_ammo += kunai_baseammo + additional_attacks
-	kunai_attack_timer.start()
-
+	# 武器换弹完成，可以再次攻击了
+	if kunai_ammo <= 0:
+		kunai_ammo = kunai_baseammo + additional_attacks
+		kunai_attack_timer.wait_time = kunai_fire_interval  # 设置射击间隔
+		kunai_attack_timer.start()
+	else:
+		print("警告：换弹触发时弹药未用完!")
+		
 func _on_kunai_attack_timer_timeout():
 	if kunai_ammo > 0:
-		# 生成kunai
+		# 发射苦无
 		var kunai_attack = kunai.instantiate()
 		kunai_attack.position = position
 		kunai_attack.target = get_random_target()
@@ -128,13 +137,23 @@ func _on_kunai_attack_timer_timeout():
 		
 		# 减少弹药
 		kunai_ammo -= 1
+		print("剩余弹药: ", kunai_ammo)  # 调试信息
 		
-		# 如果还有弹药，继续计时器
+		# 如果还有弹药，继续发射
 		if kunai_ammo > 0:
+			kunai_attack_timer.stop()
 			kunai_attack_timer.start()
 		else:
+			# 弹药用完，开始换弹
+			print("弹药用完，开始换弹，需要 ", kunai_reload_time, " 秒")
+			kunai_timer.stop()
+			kunai_timer.start()
 			kunai_attack_timer.stop()
-
+	else:
+		# 没有弹药，确保武器冷却计时器在运行
+		if kunai_timer.is_stopped():
+			kunai_timer.start()
+		kunai_attack_timer.stop()
 func get_random_target():
 	if enemy_close.size() > 0:
 		return enemy_close.pick_random().global_position
@@ -214,6 +233,8 @@ func upgrade_character(upgrade):
 			upgrade_kunai(3)
 		"ninja_kunai4":
 			upgrade_kunai(4)
+		"ninja_kunai5":
+			upgrade_kunai(5)
 		"armor1","armor2","armor3","armor4":
 			armor += 1
 		"speed1","speed2","speed3","speed4":
@@ -241,16 +262,16 @@ func upgrade_character(upgrade):
 	
 func get_random_item():
 	var dblist = []
-	for i in UpgradeDb.UPGRADES:
+	for i in UpgradeDbNinja.UPGRADES:
 		if i in collected_upgrades: #Find already collected upgrades
 			pass
 		elif i in upgrade_options: #If the upgrade is already an option
 			pass
-		elif UpgradeDb.UPGRADES[i]["type"] == "item": #Don't pick food
+		elif UpgradeDbNinja.UPGRADES[i]["type"] == "item": #Don't pick food
 			pass
-		elif UpgradeDb.UPGRADES[i]["prerequisite"].size() > 0: #Check for PreRequisites
+		elif UpgradeDbNinja.UPGRADES[i]["prerequisite"].size() > 0: #Check for PreRequisites
 			var to_add = true
-			for n in UpgradeDb.UPGRADES[i]["prerequisite"]:
+			for n in UpgradeDbNinja.UPGRADES[i]["prerequisite"]:
 				if not n in collected_upgrades:
 					to_add = false
 			if to_add:
@@ -275,12 +296,12 @@ func change_time(argtime = 0):
 	lblTimer.text = str(get_m,":",get_s)
 
 func adjust_gui_collection(upgrade):
-	var get_upgraded_displayname = UpgradeDb.UPGRADES[upgrade]["displayname"]
-	var get_type = UpgradeDb.UPGRADES[upgrade]["type"]
+	var get_upgraded_displayname = UpgradeDbNinja.UPGRADES[upgrade]["displayname"]
+	var get_type = UpgradeDbNinja.UPGRADES[upgrade]["type"]
 	if get_type != "item":
 		var get_collected_displaynames = []
 		for i in collected_upgrades:
-			get_collected_displaynames.append(UpgradeDb.UPGRADES[i]["displayname"])
+			get_collected_displaynames.append(UpgradeDbNinja.UPGRADES[i]["displayname"])
 		if not get_upgraded_displayname in get_collected_displaynames:
 			var new_item = itemContainer.instantiate()
 			new_item.upgrade = upgrade
@@ -319,18 +340,26 @@ func upgrade_kunai(target_level = 0):
 	# 根据等级设置属性
 	match kunai_level:
 		1:
-			kunai_baseammo = 1  # 初始只有1个弹药
-			kunai_attackspeed = 1.5
+			kunai_baseammo = 1
+			kunai_reload_time = 1.5  # 换弹时间
+			kunai_fire_interval = 0.2  # 射击间隔
 		2:
 			kunai_baseammo = 2
-			kunai_attackspeed = 1.4
+			kunai_reload_time = 1.4
+			kunai_fire_interval = 0.2
 		3:
 			kunai_baseammo = 3
-			kunai_attackspeed = 1.3
+			kunai_reload_time = 1.3
+			kunai_fire_interval = 0.2
 		4:
 			kunai_baseammo = 4
-			kunai_attackspeed = 1.2
+			kunai_reload_time = 1.2
+			kunai_fire_interval = 0.2
+		5:
+			kunai_baseammo = 15
+			kunai_reload_time = 0  # 较长的换弹时间
+			kunai_fire_interval = 0.1  # 更快的射击速度
 	
 	# 更新计时器
 	if kunai_timer:
-		kunai_timer.wait_time = kunai_attackspeed * (1-spell_cooldown)
+		kunai_timer.wait_time = kunai_reload_time * (1-spell_cooldown)
