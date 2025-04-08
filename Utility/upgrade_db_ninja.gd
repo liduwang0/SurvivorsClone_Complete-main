@@ -4,6 +4,38 @@ extends Node
 const ICON_PATH = "res://Textures/Items/Upgrades/"
 const WEAPON_PATH = "res://Textures/Items/Weapons/"
 const UPGRADES = {
+	"ninja_kunai1": {
+		"icon": WEAPON_PATH + "ninja_kunai.png",
+		"displayname": "Kunai",
+		"details": "A kunai is thrown at a random enemy",
+		"level": "Level: 1",
+		"prerequisite": [],
+		"type": "weapon"
+	},
+	"ninja_kunai2": {
+		"icon": WEAPON_PATH + "ninja_kunai.png",
+		"displayname": "Kunai",
+		"details": "An additional kunai is thrown",
+		"level": "Level: 2",
+		"prerequisite": ["ninja_kunai1"],
+		"type": "weapon"
+	},
+	"ninja_kunai3": {
+		"icon": WEAPON_PATH + "ninja_kunai.png",
+		"displayname": "Kunai",
+		"details": "Kunais now pass through another enemy and do + 3 damage",
+		"level": "Level: 3",
+		"prerequisite": ["ninja_kunai2"],
+		"type": "weapon"
+	},
+	"ninja_kunai4": {
+		"icon": WEAPON_PATH + "ninja_kunai.png",
+		"displayname": "Kunai",
+		"details": "An additional 2 kunais are thrown",
+		"level": "Level: 4",
+		"prerequisite": ["ninja_kunai3"],
+		"type": "weapon"
+	},
 	"chef_small_knife1": {
 		"icon": WEAPON_PATH + "chef_small_knife.png",
 		"displayname": "Ice Spear",
@@ -66,14 +98,6 @@ const UPGRADES = {
 		"details": "The chef_scissor now does + 5 damage per attack and causes 20% additional knockback",
 		"level": "Level: 4",
 		"prerequisite": ["chef_scissor3"],
-		"type": "weapon"
-	},
-	"ninja_kunai1": {
-		"icon": WEAPON_PATH + "ninja_kunai.png",
-		"displayname": "chef_scissor",
-		"details": "The chef_scissor now does + 5 damage per attack and causes 20% additional knockback",
-		"level": "Level: 1",
-		"prerequisite": [],
 		"type": "weapon"
 	},
 	"chef_rolling_pin1": {
