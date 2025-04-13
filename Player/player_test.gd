@@ -1,5 +1,59 @@
 extends CharacterBody2D
 
+# 武器定义 - 集中管理所有武器的基本属性
+const WEAPONS = {
+	"chef_small_knife": {
+		"scene": preload("res://Player/Attack/chef_small_knife.tscn"),
+		"timer_method": "timer", # 使用计时器生成弹药
+		"levels": {
+			1: {"baseammo": 1, "attackspeed": 1.5, "damage": 1},
+			2: {"baseammo": 2, "attackspeed": 1.4, "damage": 2},
+			3: {"baseammo": 3, "attackspeed": 1.3, "damage": 3},
+			4: {"baseammo": 4, "attackspeed": 1.2, "damage": 4}
+		}
+	},
+	"chef_rolling_pin": {
+		"scene": preload("res://Player/Attack/chef_rolling_pin.tscn"),
+		"timer_method": "timer", # 使用计时器生成弹药
+		"levels": {
+			1: {"baseammo": 1, "attackspeed": 3.0, "damage": 1},
+			2: {"baseammo": 2, "attackspeed": 3.0, "damage": 2},
+			3: {"baseammo": 3, "attackspeed": 3.0, "damage": 3},
+			4: {"baseammo": 4, "attackspeed": 3.0, "damage": 4},
+			5: {"baseammo": 1, "attackspeed": 1.2, "damage": 5, "special": "four_directions"}
+		}
+	},
+	"chef_scissor": {
+		"scene": preload("res://Player/Attack/chef_scissor.tscn"),
+		"timer_method": "direct", # 直接生成
+		"levels": {
+			1: {"baseammo": 1, "attackspeed": 2.0, "paths": 1},
+			2: {"baseammo": 1, "attackspeed": 1.8, "paths": 2},
+			3: {"baseammo": 2, "attackspeed": 1.6, "paths": 3},
+			4: {"baseammo": 2, "attackspeed": 1.4, "paths": 3}
+		}
+	},
+	"chef_pan": {
+		"scene": preload("res://Player/Attack/chef_pan.tscn"),
+		"timer_method": "continuous", # 连续计时器方式
+		"levels": {
+			1: {"baseammo": 1, "attackspeed": 4.0, "damage": 1},
+			2: {"baseammo": 2, "attackspeed": 3.8, "damage": 2},
+			3: {"baseammo": 3, "attackspeed": 3.2, "damage": 3},
+			4: {"baseammo": 4, "attackspeed": 3.0, "damage": 4}
+		}
+	},
+	"chef_big_knife": {
+		"scene": preload("res://Player/Attack/chef_big_knife.tscn"),
+		"timer_method": "orbital", # 轨道方式
+		"levels": {
+			1: {"count": 1, "damage": 1, "distance": 70, "rotation_speed": -0.6},
+			2: {"count": 2, "damage": 2, "distance": 80, "rotation_speed": -0.7},
+			3: {"count": 3, "damage": 3, "distance": 90, "rotation_speed": -0.8},
+			4: {"count": 4, "damage": 4, "distance": 100, "rotation_speed": -0.9}
+		}
+	}
+}
 
 var movement_speed = 100.0
 var hp = 800
@@ -145,12 +199,21 @@ func _ready():
 	chef_rolling_pin_ammo = 0
 	chef_scissor_ammo = 0
 
-var test_weapon_level=1	
+var test_weapon_level = 1	
 func test_upgrade():
 	if Input.is_action_just_pressed("test"):
-		upgrade_chef_rolling_pin(test_weapon_level)
-		test_weapon_level+=1
-		print("up")
+		# 这里可以轻松切换要测试的武器类型
+		var weapon_to_test = "chef_rolling_pin"
+		
+		# 使用通用函数升级武器
+		upgrade_weapon(weapon_to_test, test_weapon_level)
+		test_weapon_level += 1
+		
+		# 重置等级，如果超过了最大等级
+		if test_weapon_level > WEAPONS[weapon_to_test]["levels"].size():
+			test_weapon_level = 1
+		
+		print("测试升级", weapon_to_test, "到等级", test_weapon_level - 1)
 	
 func _physics_process(delta):
 	test_upgrade()
@@ -420,39 +483,39 @@ func upgrade_character(upgrade):
 	match upgrade:
 		
 		"chef_pan1":
-			upgrade_chef_pan(1)
+			upgrade_weapon("chef_pan", 1)
 		"chef_pan2":
-			upgrade_chef_pan(2)
+			upgrade_weapon("chef_pan", 2)
 		"chef_pan3":
-			upgrade_chef_pan(3)
+			upgrade_weapon("chef_pan", 3)
 		"chef_pan4":
-			upgrade_chef_pan(4)
+			upgrade_weapon("chef_pan", 4)
 		"chef_small_knife1":
-			upgrade_chef_small_knife(1)
+			upgrade_weapon("chef_small_knife", 1)
 		"chef_small_knife2":
-			upgrade_chef_small_knife(2)
+			upgrade_weapon("chef_small_knife", 2)
 		"chef_small_knife3":
-			upgrade_chef_small_knife(3)
+			upgrade_weapon("chef_small_knife", 3)
 		"chef_small_knife4":
-			upgrade_chef_small_knife(4)
+			upgrade_weapon("chef_small_knife", 4)
 		"chef_rolling_pin1":
-			upgrade_chef_rolling_pin(1)
+			upgrade_weapon("chef_rolling_pin", 1)
 		"chef_rolling_pin2":
-			upgrade_chef_rolling_pin(2)
+			upgrade_weapon("chef_rolling_pin", 2)
 		"chef_rolling_pin3":
-			upgrade_chef_rolling_pin(3)
+			upgrade_weapon("chef_rolling_pin", 3)
 		"chef_rolling_pin4":
-			upgrade_chef_rolling_pin(4)
+			upgrade_weapon("chef_rolling_pin", 4)
 		"chef_rolling_pin5":
-			upgrade_chef_rolling_pin(5)
+			upgrade_weapon("chef_rolling_pin", 5)
 		"chef_scissor1":
-			upgrade_chef_scissor(1)
+			upgrade_weapon("chef_scissor", 1)
 		"chef_scissor2":
-			upgrade_chef_scissor(2)
+			upgrade_weapon("chef_scissor", 2)
 		"chef_scissor3":
-			upgrade_chef_scissor(3)
+			upgrade_weapon("chef_scissor", 3)
 		"chef_scissor4":
-			upgrade_chef_scissor(4)
+			upgrade_weapon("chef_scissor", 4)
 		"armor1","armor2","armor3","armor4":
 			armor += 1
 		"speed1","speed2","speed3","speed4":
@@ -469,37 +532,18 @@ func upgrade_character(upgrade):
 			hp += 20
 			hp = clamp(hp,0,maxhp)
 		"chef_big_knife1":
-			chef_big_knife_level = 1
-			knife_count = 2
-			knife_damage = 1
-			knife_distance = 70
-			rotation_speed = -0.6
-			initialize_rotating_knives()
+			upgrade_weapon("chef_big_knife", 1)
 		"chef_big_knife2":
-			chef_big_knife_level = 2
-			knife_count = 3
-			knife_damage = 2
-			knife_distance = 80
-			rotation_speed = -0.7
-			initialize_rotating_knives()
+			upgrade_weapon("chef_big_knife", 2)
 		"chef_big_knife3":
-			chef_big_knife_level = 3
-			knife_count = 4
-			knife_damage = 3
-			knife_distance = 90
-			rotation_speed = -0.8
-			initialize_rotating_knives()
+			upgrade_weapon("chef_big_knife", 3)
 		"chef_big_knife4":
-			chef_big_knife_level = 4
-			knife_count = 5
-			knife_damage = 4
-			knife_distance = 100
-			rotation_speed = -0.9
-			initialize_rotating_knives()
+			upgrade_weapon("chef_big_knife", 4)
 		"chef_rolling_pin1", "chef_rolling_pin2", "chef_rolling_pin3", "chef_rolling_pin4":
-			upgrade_chef_rolling_pin(chef_rolling_pin_level + 1)
+			var new_level = chef_rolling_pin_level + 1
+			if new_level <= 5:  # 防止超过最大等级
+				upgrade_weapon("chef_rolling_pin", new_level)
 	adjust_gui_collection(upgrade)
-	attack()
 	var option_children = upgradeOptions.get_children()
 	for i in option_children:
 		i.queue_free()
@@ -629,147 +673,71 @@ func update_rotating_knives():
 				knife.update_angle(global_position)
 				#print("在 player_test.gd 中调用 update_angle")
 
-func upgrade_chef_small_knife(target_level = 0):
-	# 如果没有提供目标等级，则增加当前等级
-	if target_level == 0:
-		target_level = chef_small_knife_level + 1
+func upgrade_weapon(weapon_type, level):
+	# 确保武器类型和等级有效
+	if not WEAPONS.has(weapon_type) or not WEAPONS[weapon_type]["levels"].has(level):
+		print("ERROR: 无效的武器类型或等级")
+		return
 	
-	# 设置等级
-	chef_small_knife_level = target_level
+	# 获取武器数据
+	var weapon_data = WEAPONS[weapon_type]["levels"][level]
 	
-	# 根据等级设置属性
-	match chef_small_knife_level:
-		1:
-			chef_small_knife_baseammo = 1  # 初始只有1个弹药
-			chef_small_knife_attackspeed = 1.5
-		2:
-			chef_small_knife_baseammo = 2
-			chef_small_knife_attackspeed = 1.4
-		3:
-			chef_small_knife_baseammo = 3
-			chef_small_knife_attackspeed = 1.3
-		4:
-			chef_small_knife_baseammo = 4
-			chef_small_knife_attackspeed = 1.2
-	
-	# 更新计时器
-	if chef_small_knife_timer:
-		chef_small_knife_timer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
+	# 根据武器类型应用不同的升级逻辑
+	match weapon_type:
+		"chef_small_knife":
+			chef_small_knife_level = level
+			chef_small_knife_baseammo = weapon_data["baseammo"]
+			chef_small_knife_attackspeed = weapon_data["attackspeed"]
+			
+			# 更新计时器
+			if chef_small_knife_timer:
+				chef_small_knife_timer.wait_time = chef_small_knife_attackspeed * (1-spell_cooldown)
 		
-	# 打印调试信息
-	print("小刀升级到等级", chef_small_knife_level)
-	print("基础弹药:", chef_small_knife_baseammo)
-	print("额外攻击:", additional_attacks)
-
-func upgrade_chef_rolling_pin(target_level):
-	# 设置等级
-	chef_rolling_pin_level = target_level
-	
-	# 根据等级设置属性
-	match chef_rolling_pin_level:
-		1:
-			chef_rolling_pin_baseammo = 1
-			chef_rolling_pin_attackspeed = 3.0
-		2:
-			chef_rolling_pin_baseammo = 2
-			chef_rolling_pin_attackspeed = 2.5
-		3:
-			chef_rolling_pin_baseammo = 3
-			chef_rolling_pin_attackspeed = 2.0
-		4:
-			chef_rolling_pin_baseammo = 4
-			chef_rolling_pin_attackspeed = 1.5
-		5:
-			chef_rolling_pin_baseammo = 1
-			chef_rolling_pin_attackspeed = 1.2
-	
-	# 确保计时器使用新的攻击速度
-	if chef_rolling_pin_timer:
-		chef_rolling_pin_timer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
+		"chef_rolling_pin":
+			chef_rolling_pin_level = level
+			chef_rolling_pin_baseammo = weapon_data["baseammo"]
+			chef_rolling_pin_attackspeed = weapon_data["attackspeed"]
+			
+			# 更新计时器
+			if chef_rolling_pin_timer:
+				chef_rolling_pin_timer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
+				
+				# 如果是首次升级，确保计时器启动
+				if level == 1 and chef_rolling_pin_timer.is_stopped():
+					chef_rolling_pin_timer.start()
 		
-		# 如果这是首次升级，确保计时器启动
-		if chef_rolling_pin_level == 1 and chef_rolling_pin_timer.is_stopped():
-			chef_rolling_pin_timer.start()
-
-func upgrade_chef_pan(target_level = 0):
-	# 如果没有提供目标等级，则增加当前等级
-	if target_level == 0:
-		target_level = chef_pan_level + 1
-	
-	# 设置等级
-	chef_pan_level = target_level
-	
-	# 根据等级设置属性
-	match chef_pan_level:
-		1:
-			chef_pan_baseammo = 1
-			chef_pan_attackspeed = 4.0
-		2:
-			chef_pan_baseammo = 2
-			chef_pan_attackspeed = 3.8
-		3:
-			chef_pan_baseammo = 3
-			chef_pan_attackspeed = 3.2
-		4:
-			chef_pan_baseammo = 4
-			chef_pan_attackspeed = 3.0
-	
-	# 不再设置 chef_pan_ammo
-	# chef_pan_ammo = chef_pan_baseammo + additional_attacks
+		"chef_scissor":
+			chef_scissor_level = level
+			chef_scissor_baseammo = weapon_data["baseammo"]
+			chef_scissor_attackspeed = weapon_data["attackspeed"]
+			
+			# 直接应用弹药量
+			chef_scissor_ammo = chef_scissor_baseammo + additional_attacks
+			spawn_chef_scissor()
+		
+		"chef_pan":
+			chef_pan_level = level
+			chef_pan_baseammo = weapon_data["baseammo"]
+			chef_pan_attackspeed = weapon_data["attackspeed"]
+		
+		"chef_big_knife":
+			chef_big_knife_level = level
+			knife_count = weapon_data["count"]
+			knife_damage = weapon_data["damage"]
+			knife_distance = weapon_data["distance"]
+			rotation_speed = weapon_data["rotation_speed"]
+			
+			# 初始化旋转刀
+			initialize_rotating_knives()
 	
 	# 打印调试信息
-	print("平底锅升级到等级", chef_pan_level)
-	print("基础弹药:", chef_pan_baseammo)
-	print("额外攻击:", additional_attacks)
-
-func upgrade_chef_scissor(target_level):
-	# 设置等级
-	chef_scissor_level = target_level
+	print(weapon_type, "升级到等级", level)
+	if weapon_data.has("baseammo"):
+		print("基础弹药:", weapon_data["baseammo"])
+	if weapon_data.has("damage"):
+		print("伤害:", weapon_data["damage"])
+	if weapon_data.has("count"):
+		print("数量:", weapon_data["count"])
 	
-	# 根据等级设置属性
-	match chef_scissor_level:
-		1:
-			chef_scissor_baseammo = 1
-			chef_scissor_attackspeed = 2.0
-		2:
-			chef_scissor_baseammo = 1
-			chef_scissor_attackspeed = 1.8
-		3:
-			chef_scissor_baseammo = 2
-			chef_scissor_attackspeed = 1.6
-		4:
-			chef_scissor_baseammo = 2
-			chef_scissor_attackspeed = 1.4
-	
-	# 应用戒指效果
-	chef_scissor_ammo = chef_scissor_baseammo + additional_attacks
-
-func upgrade_chef_big_knife(target_level):
-	# 设置等级
-	chef_big_knife_level = target_level
-	
-	# 根据等级设置属性
-	match chef_big_knife_level:
-		1:
-			knife_count = 2
-			knife_damage = 1
-			knife_distance = 70
-			rotation_speed = -0.6
-		2:
-			knife_count = 3
-			knife_damage = 1.5
-			knife_distance = 80
-			rotation_speed = -0.7
-		3:
-			knife_count = 4
-			knife_damage = 2
-			knife_distance = 90
-			rotation_speed = -0.8
-		4:
-			knife_count = 5
-			knife_damage = 2.5
-			knife_distance = 100
-			rotation_speed = -0.9
-	
-	# 初始化旋转刀
-	initialize_rotating_knives()
+	# 更新攻击
+	attack()
