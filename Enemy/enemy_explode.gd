@@ -200,7 +200,7 @@ func damage_nearby_enemies():
 	explosion_hitbox.add_child(timer)
 	timer.timeout.connect(func(): explosion_hitbox.queue_free())
 	
-	print("============= 爆炸伤害调试结束 =============")
+	#print("============= 爆炸伤害调试结束 =============")
 
 # 辅助函数：递归查找所有敌人(CharacterBody2D)
 func _find_all_enemies(node, result):
