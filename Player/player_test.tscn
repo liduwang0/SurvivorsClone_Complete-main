@@ -73,6 +73,14 @@ wait_time = 3.0
 unique_name_in_owner = true
 wait_time = 0.2
 
+[node name="chef_whiskTimer" type="Timer" parent="Attack"]
+unique_name_in_owner = true
+wait_time = 3.0
+
+[node name="chef_whiskAttackTimer" type="Timer" parent="Attack/chef_whiskTimer"]
+unique_name_in_owner = true
+wait_time = 0.2
+
 [node name="chef_scissorBase" type="Node2D" parent="Attack"]
 unique_name_in_owner = true
 
@@ -252,6 +260,8 @@ columns = 10
 [connection signal="timeout" from="Attack/chef_small_knifeTimer/chef_small_knifeAttackTimer" to="." method="_on_chef_small_knife_attack_timer_timeout"]
 [connection signal="timeout" from="Attack/chef_rolling_pinTimer" to="." method="_on_chef_rolling_pin_timer_timeout"]
 [connection signal="timeout" from="Attack/chef_rolling_pinTimer/chef_rolling_pinAttackTimer" to="." method="_on_chef_rolling_pin_attack_timer_timeout"]
+[connection signal="timeout" from="Attack/chef_whiskTimer" to="." method="_on_chef_whisk_timer_timeout"]
+[connection signal="timeout" from="Attack/chef_whiskTimer/chef_whiskAttackTimer" to="." method="_on_chef_whisk_attack_timer_timeout"]
 [connection signal="body_entered" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_entered"]
 [connection signal="body_exited" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_exited"]
 [connection signal="area_entered" from="GrabArea" to="." method="_on_grab_area_area_entered"]

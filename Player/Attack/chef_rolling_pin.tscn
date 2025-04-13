@@ -17,6 +17,7 @@ script = ExtResource("1_wnjow")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(9.53674e-07, -9.53674e-07)
 rotation = -0.785398
+scale = Vector2(1.02543, 0.993303)
 texture = ExtResource("2_vfb0l")
 flip_h = true
 

@@ -32,12 +32,12 @@ func _on_area_entered(area):
 			var knockback = 1
 			
 			# 添加调试打印
-			print("武器 ID:", area.get_instance_id(), " 是否有angle属性:", area.get("angle") != null)
+			#print("武器 ID:", area.get_instance_id(), " 是否有angle属性:", area.get("angle") != null)
 			
 			if not area.get("angle") == null:
 				angle = area.angle
 				# 添加调试打印
-				print("获取到武器角度:", angle)
+				#print("获取到武器角度:", angle)
 			if not area.get("knockback_amount") == null:
 				knockback = area.knockback_amount
 			
