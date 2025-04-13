@@ -1,0 +1,85 @@
+[gd_scene load_steps=6 format=3 uid="uid://dlxbp80a8y2bj"]
+
+[ext_resource type="Script" uid="uid://bkcvsiy7nbnc0" path="res://Player/Attack/chef_whisk.gd" id="1_4n5uy"]
+[ext_resource type="Texture2D" uid="uid://cyp35k7mawoa" path="res://Textures/Items/Weapons/chef_whisk.png" id="2_6bw7y"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_k8u47"]
+radius = 50.0
+
+[sub_resource type="Animation" id="Animation_bq3wg"]
+resource_name = "vortex"
+length = 5.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 12.5664]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5, 4.5, 5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.5, 0.5), Vector2(1, 1), Vector2(1, 1), Vector2(0.5, 0.5)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_a3n2y"]
+_data = {
+&"vortex": SubResource("Animation_bq3wg")
+}
+
+[node name="chef_whisk" type="Area2D" groups=["attack"]]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_4n5uy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0.6, 0.2, 0.8)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_6bw7y")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_k8u47")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_a3n2y")
+}
+
+[node name="VortexTimer" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true
+
+[node name="DurationTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
+[connection signal="timeout" from="VortexTimer" to="." method="_on_vortex_timer_timeout"]
+[connection signal="timeout" from="DurationTimer" to="." method="_on_duration_timer_timeout"]
