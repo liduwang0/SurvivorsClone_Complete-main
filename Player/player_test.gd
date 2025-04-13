@@ -145,7 +145,15 @@ func _ready():
 	chef_rolling_pin_ammo = 0
 	chef_scissor_ammo = 0
 
+var test_weapon_level=1	
+func test_upgrade():
+	if Input.is_action_just_pressed("test"):
+		upgrade_chef_rolling_pin(test_weapon_level)
+		test_weapon_level+=1
+		print("up")
+	
 func _physics_process(delta):
+	test_upgrade()
 	movement()
 	if chef_big_knife_level > 0:
 		update_rotating_knives()
@@ -672,15 +680,16 @@ func upgrade_chef_rolling_pin(target_level):
 			chef_rolling_pin_baseammo = 4
 			chef_rolling_pin_attackspeed = 1.5
 		5:
-			chef_rolling_pin_baseammo = 1  # 第5级只需要1个基础弹药，因为会向四个方向发射
+			chef_rolling_pin_baseammo = 1
 			chef_rolling_pin_attackspeed = 1.2
-	
-	# 应用戒指效果
-	chef_rolling_pin_ammo = chef_rolling_pin_baseammo + additional_attacks
 	
 	# 确保计时器使用新的攻击速度
 	if chef_rolling_pin_timer:
 		chef_rolling_pin_timer.wait_time = chef_rolling_pin_attackspeed * (1-spell_cooldown)
+		
+		# 如果这是首次升级，确保计时器启动
+		if chef_rolling_pin_level == 1 and chef_rolling_pin_timer.is_stopped():
+			chef_rolling_pin_timer.start()
 
 func upgrade_chef_pan(target_level = 0):
 	# 如果没有提供目标等级，则增加当前等级

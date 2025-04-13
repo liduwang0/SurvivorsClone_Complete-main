@@ -1,3 +1,9 @@
+0.1.1
+T 键可以升级武器
+添加了士兵
+修复擀面杖每次升级多次发射
+
+
 0.1.0
 
 character has stable version, can update weaponse, rotate big knife is repaired

@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bln8nbuy1uu3e"]
+
+[ext_resource type="Texture2D" uid="uid://chs611yf5p3hy" path="res://Textures/GUI/EmptyItem.png" id="1_qr1mt"]
+[ext_resource type="Script" uid="uid://6q7dmiq27fja" path="res://Player/GUI/item_container_soldier.gd" id="2_qr1mt"]
+
+[node name="ItemContainer" type="TextureRect"]
+offset_right = 12.0
+offset_bottom = 12.0
+texture = ExtResource("1_qr1mt")
+script = ExtResource("2_qr1mt")
+
+[node name="ItemTexture" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 33.0
+offset_bottom = 33.0
+scale = Vector2(0.33, 0.33)

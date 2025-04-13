@@ -1,0 +1,268 @@
+extends TileMap
+
+var myNoise = FastNoiseLite.new()
+var myNoise2 = FastNoiseLite.new()
+var myNoise3 = FastNoiseLite.new()
+var treeNoise = FastNoiseLite.new()
+
+# 固定地图大小
+var map_width = 50
+var map_height = 50
+
+# 地形生成阈值控制
+var water_threshold = -0.7  # 值越低，水越少
+var path_threshold = 0.2    # 值越低，路越多
+var tree_density = 0.03     # 树木密度控制（0-1之间，值越低树越少）
+
+# 定义不同的地形类型
+enum TerrainType {
+	PATH = 0,  # 土路
+	GRASS = 1, # 草地
+	WATER = 2  # 水域
+}
+
+# 定义层
+const TERRAIN_LAYER = 0  # 地形层
+const TREE_LAYER = 1     # 树木层
+
+# 定义树木组合（每个组合是一棵完整的树）
+var tree_sets = [
+	
+		# 大石头（竖直两格）- 上下两部分必须一起放置
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(16, 15)},  # 上部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(16, 16)}   # 下部
+		]
+	},
+	
+		# 大石头（竖直两格）- 上下两部分必须一起放置
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(10, 17)},  # 上部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(10, 18)}   # 下部
+		]
+	},
+	
+		# 大石头（竖直两格）- 上下两部分必须一起放置
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(11, 17)},  # 上部
+			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(12, 17)},   # 下部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(11, 18)},  # 上部
+			{"offset": Vector2i(1, 1), "source_id": 5, "coords": Vector2i(12, 18)}   # 下部
+		]
+	},
+	# 大石头（竖直两格）- 上下两部分必须一起放置
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(8, 21)},  # 上部
+			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(9, 21)}   # 下部
+		]
+	},
+	# 中石头（竖直两格）
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(6, 21)}
+		]
+	},
+	{
+		#小石头1
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(9, 20)}  # 上左部
+			
+		]
+	},
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(8, 19)}  # 上左部
+			
+		]
+	},
+	{
+		#中石头
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(7, 21)}  # 上左部
+			
+		]
+	},
+
+	{
+		#平石头
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(11, 21)}  # 上左部
+			
+		]
+	},
+	# 小树3（竖直两格）
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(3, 24)},  # 上部
+			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(4, 24)},  # 上部
+			{"offset": Vector2i(2, 0), "source_id": 5, "coords": Vector2i(5, 24)},  # 上部
+			{"offset": Vector2i(3, 0), "source_id": 5, "coords": Vector2i(6, 24)},  # 上部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(3, 25)},  # 上部
+			{"offset": Vector2i(3, 1), "source_id": 5, "coords": Vector2i(6, 25)},  # 上部
+			{"offset": Vector2i(0, 2), "source_id": 5, "coords": Vector2i(3, 26)},  # 上部
+			{"offset": Vector2i(1, 2), "source_id": 5, "coords": Vector2i(4, 26)},  # 上部
+			{"offset": Vector2i(2, 2), "source_id": 5, "coords": Vector2i(5, 26)},  # 上部
+			{"offset": Vector2i(3, 2), "source_id": 5, "coords": Vector2i(6, 26)}   # 下部
+		]
+	}
+	# 可以添加更多树木组合
+]
+
+func _ready():
+	# 设置噪声参数
+	myNoise.seed = randi()
+	myNoise2.seed = randi() + 100
+	myNoise3.seed = randi() + 200
+	treeNoise.seed = randi() + 300
+	
+	# 设置更平滑的噪声参数
+	myNoise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	myNoise.frequency = 0.05
+	myNoise.fractal_type = FastNoiseLite.FRACTAL_FBM
+	myNoise.fractal_octaves = 10
+	myNoise.fractal_lacunarity = 2.0
+	myNoise.fractal_gain = 0.2
+	
+	# 设置树木噪声参数
+	treeNoise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	treeNoise.frequency = 0.1
+	treeNoise.fractal_type = FastNoiseLite.FRACTAL_FBM
+	treeNoise.fractal_octaves = 4
+	treeNoise.fractal_lacunarity = 2.0
+	treeNoise.fractal_gain = 0.5
+	
+	# 启用YSort以确保树木正确显示在地形之上
+	y_sort_enabled = true
+	
+	# 生成地图
+	generate_map()
+
+# 生成地图
+func generate_map():
+	# 清除所有瓦片
+	clear()
+	
+	# 地图中心点
+	var center_x = -map_width / 2
+	var center_y = -map_height / 2
+	
+	# 收集不同地形的单元格
+	var water_cells = []
+	var grass_cells = []
+	var path_cells = []
+	
+	# 基于噪声为每个位置分配地形
+	for x in range(center_x, center_x + map_width):
+		for y in range(center_y, center_y + map_height):
+			var pos = Vector2i(x, y)
+			var noise_val = myNoise.get_noise_2d(float(x), float(y))
+			
+			# 使用阈值变量来控制地形生成比例
+			if noise_val < water_threshold:
+				water_cells.append(pos)
+			elif noise_val > path_threshold:
+				path_cells.append(pos)
+			else:
+				grass_cells.append(pos)
+	
+	# 放置地形
+	if water_cells.size() > 0:
+		set_cells_terrain_connect(TERRAIN_LAYER, water_cells, 0, TerrainType.WATER)
+	if path_cells.size() > 0:
+		set_cells_terrain_connect(TERRAIN_LAYER, path_cells, 0, TerrainType.PATH)
+	if grass_cells.size() > 0:
+		set_cells_terrain_connect(TERRAIN_LAYER, grass_cells, 0, TerrainType.GRASS)
+	
+	print("准备放置树木，共有草地格子: ", grass_cells.size())
+	
+	# 在草地上生成树木
+	place_tree_sets(grass_cells)
+	
+	# 检查并填充黑块
+	fill_black_cells()
+	
+	# 为水域添加碰撞
+	add_water_collision()
+
+# 放置树木组合
+func place_tree_sets(grass_cells):
+	var available_cells = grass_cells.duplicate()
+	var trees_placed = 0
+	
+	for pos in grass_cells:
+		if randf() > (1.0 - tree_density) and pos in available_cells:  # 使用tree_density控制概率
+			# 随机选择一种树木组合
+			var tree_set = tree_sets[randi() % tree_sets.size()]
+			
+			# 检查是否有足够的空间放置整个树
+			var can_place = true
+			for piece in tree_set.pieces:
+				var check_pos = pos + piece.offset
+				if not check_pos in available_cells:
+					can_place = false
+					break
+			
+			if can_place:
+				# 放置整棵树的所有部分
+				for piece in tree_set.pieces:
+					var place_pos = pos + piece.offset
+					set_cell(TREE_LAYER, place_pos, piece.source_id, piece.coords)
+					available_cells.erase(place_pos)
+				
+				trees_placed += 1
+	
+	print("共放置了 ", trees_placed, " 棵树")
+
+# 填充黑块位置为草地瓦片
+func fill_black_cells():
+	var black_cells = []
+	var center_x = -map_width / 2
+	var center_y = -map_height / 2
+	
+	# 查找所有黑块位置
+	for x in range(center_x, center_x + map_width):
+		for y in range(center_y, center_y + map_height):
+			var pos = Vector2i(x, y)
+			if get_cell_source_id(0, pos) == -1:  # -1表示没有瓦片
+				black_cells.append(pos)
+	
+	# 如果有黑块，用草地瓦片填充
+	if black_cells.size() > 0:
+		# 获取第一个源（通常是我们的瓦片集）
+		var source_id = tile_set.get_source_id(0)
+		
+		# 使用草地的中心瓦片（通常是完整的草地瓦片）
+		var grass_coords = Vector2i(3, 1)  # 假设这是草地瓦片的坐标
+		
+		# 直接设置瓦片
+		for pos in black_cells:
+			set_cell(0, pos, source_id, grass_coords)
+	else:
+		print("没有发现黑块")
+
+# 为水域添加碰撞
+func add_water_collision():
+	var water_body = StaticBody2D.new()
+	water_body.name = "WaterCollision"
+	add_child(water_body)
+	
+	for pos in get_used_cells(0):
+		var tile_data = get_cell_tile_data(0, pos)
+		if tile_data != null and tile_data.get_terrain_set() == 0 and tile_data.get_terrain() == TerrainType.WATER:
+			var collision = CollisionShape2D.new()
+			var shape = RectangleShape2D.new()
+			shape.size = tile_set.tile_size
+			collision.shape = shape
+			collision.position = map_to_local(pos)
+			water_body.add_child(collision)
+
+# 重新生成地图
+func regenerate_map():
+	myNoise.seed = randi()
+	myNoise2.seed = randi() + 100
+	myNoise3.seed = randi() + 200
+	generate_map()
