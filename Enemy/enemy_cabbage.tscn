@@ -7,7 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://bi7t7cjthnhhc" path="res://Audio/SoundEffect/enemy_hit.ogg" id="5_632nb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_62rh2"]
-radius = 5.09902
+radius = 3.0
 
 [sub_resource type="Animation" id="Animation_xfnyu"]
 length = 0.001

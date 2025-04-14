@@ -1,10 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://bnhpyhted0jgh"]
+[gd_scene load_steps=16 format=3 uid="uid://btcta45mlhpd7"]
 
-[ext_resource type="Script" uid="uid://bgnxr1ce3vj68" path="res://Enemy/enemy.gd" id="1_27qdn"]
-[ext_resource type="Texture2D" uid="uid://4mvyvb1vvg14" path="res://Textures/Enemy/Banana Sprite Sheet.png" id="2_27qdn"]
-[ext_resource type="PackedScene" uid="uid://xy3cvpwdy828" path="res://Utility/hurt_box.tscn" id="3_p2oup"]
-[ext_resource type="PackedScene" uid="uid://uhr6mtuisqm1" path="res://Utility/hit_box.tscn" id="4_f045k"]
-[ext_resource type="AudioStream" uid="uid://bi7t7cjthnhhc" path="res://Audio/SoundEffect/enemy_hit.ogg" id="5_aa186"]
+[ext_resource type="Script" uid="uid://b8tdcaycbhvut" path="res://Enemy/enemy_banana_king.gd" id="1_gtn7g"]
+[ext_resource type="Texture2D" uid="uid://4mvyvb1vvg14" path="res://Textures/Enemy/Banana Sprite Sheet.png" id="2_snlhq"]
+[ext_resource type="PackedScene" uid="uid://xy3cvpwdy828" path="res://Utility/hurt_box.tscn" id="3_gwrxj"]
+[ext_resource type="PackedScene" uid="uid://uhr6mtuisqm1" path="res://Utility/hit_box.tscn" id="4_wf21m"]
+[ext_resource type="AudioStream" uid="uid://bi7t7cjthnhhc" path="res://Audio/SoundEffect/enemy_hit.ogg" id="5_lmysp"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_62rh2"]
 radius = 5.0
@@ -74,6 +74,23 @@ tracks/0/keys = {
 "values": [64, 65, 66, 67]
 }
 
+[sub_resource type="Animation" id="Animation_gtn7g"]
+resource_name = "run"
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [32, 33, 34, 35, 36, 37, 38, 39, 40, 41]
+}
+
 [sub_resource type="Animation" id="Animation_w8hns"]
 resource_name = "walk"
 length = 1.2
@@ -98,6 +115,7 @@ _data = {
 &"attack": SubResource("Animation_sb4p8"),
 &"dead": SubResource("Animation_ikc3m"),
 &"hurt": SubResource("Animation_27qdn"),
+&"run": SubResource("Animation_gtn7g"),
 &"walk": SubResource("Animation_w8hns")
 }
 
@@ -107,23 +125,27 @@ size = Vector2(14, 18)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ucec4"]
 size = Vector2(12, 18)
 
-[node name="enemy_banana" type="CharacterBody2D" groups=["enemy"]]
-position = Vector2(0, -16)
+[node name="enemy_banana_king" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 5
 collision_mask = 5
 motion_mode = 1
-script = ExtResource("1_27qdn")
+script = ExtResource("1_gtn7g")
+movement_speed = 40.0
+hp = 100
+knockback_recovery = 10.0
+experience = 50
+enemy_damage = 10
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(-0.111843, 4.27805)
-scale = Vector2(-1, 1)
-texture = ExtResource("2_27qdn")
-offset = Vector2(-0.111843, -4.27805)
+position = Vector2(-0.0336962, -0.0487947)
+scale = Vector2(-2, 2)
+texture = ExtResource("2_snlhq")
+offset = Vector2(-1.51685, -15.9756)
 hframes = 16
 vframes = 6
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 7)
+position = Vector2(2, -18)
 shape = SubResource("CircleShape2D_62rh2")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -132,7 +154,8 @@ libraries = {
 }
 speed_scale = 1.364
 
-[node name="HurtBox" parent="." instance=ExtResource("3_p2oup")]
+[node name="HurtBox" parent="." instance=ExtResource("3_gwrxj")]
+position = Vector2(1, -24)
 collision_mask = 4
 HurtBoxType = 1
 
@@ -140,7 +163,8 @@ HurtBoxType = 1
 position = Vector2(0, 6)
 shape = SubResource("RectangleShape2D_rborl")
 
-[node name="HitBox" parent="." instance=ExtResource("4_f045k")]
+[node name="HitBox" parent="." instance=ExtResource("4_wf21m")]
+position = Vector2(1, -25)
 collision_layer = 2
 
 [node name="CollisionShape2D" parent="HitBox" index="0"]
@@ -148,7 +172,7 @@ position = Vector2(0, 7)
 shape = SubResource("RectangleShape2D_ucec4")
 
 [node name="snd_hit" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("5_aa186")
+stream = ExtResource("5_lmysp")
 volume_db = -20.0
 
 [connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]

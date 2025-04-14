@@ -32,10 +32,7 @@ var attack_timer = 0.0
 var attack_range = 15.0  # 攻击范围，可以根据需要调整
 
 func _ready():
-	if anim.has_animation("walk"):
-		anim.play("walk")
-	else:
-		print("Warning: 'walk' animation not found in AnimationPlayer")
+	anim.play("run")
 	hitBox.damage = enemy_damage
 	
 	# 保存原始颜色
@@ -78,10 +75,7 @@ func _physics_process(_delta):
 		attack_timer = 0.0
 	elif anim.current_animation != "attack" and anim.current_animation != "hurt" and knockback.length() < 5:
 		# 如果不在攻击或受伤动画中，播放行走动画
-		if anim.has_animation("walk"):
-			anim.play("walk")
-		else:
-			print("Warning: 'walk' animation not found in AnimationPlayer")
+		anim.play("run")
 	
 	# 设置速度
 	velocity = direction * movement_speed
@@ -180,4 +174,4 @@ func _on_hurt_box_hurt(damage_amount: float, direction: Vector2, knockback_amoun
 func _on_animation_finished(anim_name):
 	if anim_name == "attack":
 		# 攻击动画完成后恢复行走
-		anim.play("walk")
+		anim.play("run")
