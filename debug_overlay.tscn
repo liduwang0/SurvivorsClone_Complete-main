@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://qx7iuo66euky"]
 
-[ext_resource type="Script" path="res://z_debug_display.gd" id="1_7hbe8"]
+[ext_resource type="Script" uid="uid://dei8i634xhl6e" path="res://z_debug_display.gd" id="1_7hbe8"]
 
 [node name="DebugOverlay" type="Node2D"]
 z_index = 100

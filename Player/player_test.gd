@@ -165,7 +165,7 @@ var enemy_close = []
 
 
 @onready var sprite = $Sprite2D
-@onready var walkTimer = get_node("%walkTimer")
+@onready var animation_player = $AnimationPlayer  # 保留AnimationPlayer引用
 
 #GUI
 @onready var expBar = get_node("%ExperienceBar")
@@ -276,19 +276,17 @@ func movement():
 	var x_mov = Input.get_action_strength("right") - Input.get_action_strength("left")
 	var y_mov = Input.get_action_strength("down") - Input.get_action_strength("up")
 	var mov = Vector2(x_mov,y_mov)
-	if mov.x > 0:
-		sprite.flip_h = true
-	elif mov.x < 0:
-		sprite.flip_h = false
+	
+	# 根据移动方向翻转精灵
+	if mov.x != 0:  # 只要有水平移动，就根据水平方向决定朝向
+		sprite.flip_h = mov.x < 0  # 向右移动时false，向左移动时true
 
+	# 根据是否移动来播放不同的动画
 	if mov != Vector2.ZERO:
 		last_movement = mov
-		if walkTimer.is_stopped():
-			if sprite.frame >= sprite.hframes - 1:
-				sprite.frame = 0
-			else:
-				sprite.frame += 1
-			walkTimer.start()
+		animation_player.play("walk")  # 播放行走动画
+	else:
+		animation_player.play("idle")  # 播放待机动画
 	
 	velocity = mov.normalized()*movement_speed
 	move_and_slide()
