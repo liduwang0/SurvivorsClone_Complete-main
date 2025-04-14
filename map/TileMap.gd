@@ -6,13 +6,13 @@ var myNoise3 = FastNoiseLite.new()
 var treeNoise = FastNoiseLite.new()
 
 # 固定地图大小
-var map_width = 50
-var map_height = 50
+var map_width = 70
+var map_height = 70
 
 # 地形生成阈值控制
-var water_threshold = -0.7  # 值越低，水越少
-var path_threshold = 0.2    # 值越低，路越多
-var tree_density = 0.03     # 树木密度控制（0-1之间，值越低树越少）
+var water_threshold = -0.6  # 值越低，水越少
+var path_threshold = 0.3    # 值越低，路越多
+var tree_density = 0.06     # 树木密度控制（0-1之间，值越低树越少）
 
 # 定义不同的地形类型
 enum TerrainType {
@@ -59,6 +59,15 @@ var tree_sets = [
 			{"offset": Vector2i(1, 1), "source_id": 5, "coords": Vector2i(12, 18)}   # 下部
 		]
 	},
+		# 树4 大园树
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(12, 15)},  # 上部
+			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(13, 15)},   # 下部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(12, 16)},  # 上部
+			{"offset": Vector2i(1, 1), "source_id": 5, "coords": Vector2i(13, 16)}   # 下部
+		]
+	},	
 		# 树10 大松树
 	{
 		"pieces": [
@@ -84,12 +93,12 @@ var tree_sets = [
 			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(9, 21)}   # 下部
 		]
 	},
-	# 石头5
-	{
-		"pieces": [
-			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(6, 21)}
-		]
-	},
+	## 石头5
+	#{
+		#"pieces": [
+			#{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(6, 21)}
+		#]
+	#},
 	{
 		#石头4
 		"pieces": [
