@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bytifwhgfbvd8"]
+
+[ext_resource type="Script" path="res://complete_y_sort_fix.gd" id="1_jfq3q"]
+
+[node name="CompleteFix" type="Node"]
+script = ExtResource("1_jfq3q") 

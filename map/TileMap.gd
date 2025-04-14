@@ -28,15 +28,21 @@ const TREE_LAYER = 1     # 树木层
 # 定义树木组合（每个组合是一棵完整的树）
 var tree_sets = [
 	
-		# 大石头（竖直两格）- 上下两部分必须一起放置
+		# 树6 小松树
 	{
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(16, 15)},  # 上部
 			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(16, 16)}   # 下部
 		]
 	},
-	
-		# 大石头（竖直两格）- 上下两部分必须一起放置
+			# 树7 恐怖树
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(9, 17)},  # 上部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(9, 18)}   # 下部
+		]
+	},
+		# 树8 枯树
 	{
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(10, 17)},  # 上部
@@ -44,7 +50,7 @@ var tree_sets = [
 		]
 	},
 	
-		# 大石头（竖直两格）- 上下两部分必须一起放置
+		# 树9 大白桦树
 	{
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(11, 17)},  # 上部
@@ -53,34 +59,68 @@ var tree_sets = [
 			{"offset": Vector2i(1, 1), "source_id": 5, "coords": Vector2i(12, 18)}   # 下部
 		]
 	},
-	# 大石头（竖直两格）- 上下两部分必须一起放置
+		# 树10 大松树
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(13, 17)},  # 上部
+			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(14, 17)},   # 下部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(13, 18)},  # 上部
+			{"offset": Vector2i(1, 1), "source_id": 5, "coords": Vector2i(14, 18)}   # 下部
+		]
+	},
+			# 树11 大白桦树 深色
+	{
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(15, 17)},  # 上部
+			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(16, 17)},   # 下部
+			{"offset": Vector2i(0, 1), "source_id": 5, "coords": Vector2i(15, 18)},  # 上部
+			{"offset": Vector2i(1, 1), "source_id": 5, "coords": Vector2i(16, 18)}   # 下部
+		]
+	},
+	# 大石头 水平2格
 	{
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(8, 21)},  # 上部
 			{"offset": Vector2i(1, 0), "source_id": 5, "coords": Vector2i(9, 21)}   # 下部
 		]
 	},
-	# 中石头（竖直两格）
+	# 石头5
 	{
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(6, 21)}
 		]
 	},
 	{
-		#小石头1
+		#石头4
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(9, 20)}  # 上左部
 			
 		]
 	},
 	{
+		#蘑菇3
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(8, 19)}  # 上左部
 			
 		]
 	},
 	{
-		#中石头
+		#蘑菇8
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(13, 19)}  # 上左部
+			
+		]
+	},
+	{
+		#蘑菇6
+		"pieces": [
+			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(11, 19)}  # 上左部
+			
+		]
+	},
+			
+	{
+		#石头6
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(7, 21)}  # 上左部
 			
@@ -88,7 +128,7 @@ var tree_sets = [
 	},
 
 	{
-		#平石头
+		#石头9
 		"pieces": [
 			{"offset": Vector2i(0, 0), "source_id": 5, "coords": Vector2i(11, 21)}  # 上左部
 			
@@ -137,6 +177,13 @@ func _ready():
 	
 	# 启用YSort以确保树木正确显示在地形之上
 	y_sort_enabled = true
+	
+	# 设置层级的Z索引
+	set_layer_z_index(TERRAIN_LAYER, -10)  # 地形层Z索引设为-10
+	set_layer_y_sort_enabled(TERRAIN_LAYER, true)  # 地形层启用Y排序
+	
+	set_layer_z_index(TREE_LAYER, 0)  # 树木层Z索引设为0
+	set_layer_y_sort_enabled(TREE_LAYER, true)  # 树木层启用Y排序
 	
 	# 生成地图
 	generate_map()

@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://dxfm8r1sxq01y"]
+
+[ext_resource type="Script" path="res://debug_main.gd" id="1_1t3g4"]
+[ext_resource type="Script" path="res://fix_y_sort.gd" id="2_o8rgo"]
+
+[node name="DebugToolkit" type="Node"]
+script = ExtResource("1_1t3g4")
+
+[node name="YSortFixer" type="Node" parent="."]
+script = ExtResource("2_o8rgo")
+
+[node name="ControlPanel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_bottom = 150.0
+grow_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ControlPanel/VBoxContainer"]
+layout_mode = 2
+text = "调试工具面板"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="ControlPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RunDebugButton" type="Button" parent="ControlPanel/VBoxContainer"]
+layout_mode = 2
+text = "运行调试 (F1)"
+
+[node name="RunFixButton" type="Button" parent="ControlPanel/VBoxContainer"]
+layout_mode = 2
+text = "应用修复 (F2)"
+
+[node name="TipsLabel" type="Label" parent="ControlPanel/VBoxContainer"]
+layout_mode = 2
+text = "ESC: 显示/隐藏调试信息"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="ControlPanel/VBoxContainer/RunDebugButton" to="." method="debug_scene_structure"]
+[connection signal="pressed" from="ControlPanel/VBoxContainer/RunFixButton" to="." method="fix_scene_issues"] 

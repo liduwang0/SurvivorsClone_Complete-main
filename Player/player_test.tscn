@@ -14,7 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://b7c7gsdx2rkjm" path="res://Utility/basic_button.tscn" id="12_a3dpp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ycmgb"]
-size = Vector2(25, 30)
+size = Vector2(25, 3)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yfi4i"]
 size = Vector2(12, 20)
@@ -28,18 +28,21 @@ radius = 50.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_6vwp8"]
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
+position = Vector2(0, 16)
 motion_mode = 1
 script = ExtResource("1_q4vxr")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -16)
 texture = ExtResource("2_ycmgb")
 hframes = 2
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(2.5, 1)
+position = Vector2(0, -1.5)
 shape = SubResource("RectangleShape2D_ycmgb")
+disabled = true
 
 [node name="walkTimer" type="Timer" parent="."]
 unique_name_in_owner = true
@@ -47,7 +50,7 @@ wait_time = 0.2
 one_shot = true
 
 [node name="HurtBox" parent="." instance=ExtResource("3_snoa8")]
-visible = false
+position = Vector2(-1, -16)
 collision_mask = 2
 HurtBoxType = 2
 
@@ -113,6 +116,7 @@ collision_layer = 0
 collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollectArea"]
+position = Vector2(0, -16)
 shape = SubResource("CircleShape2D_6vwp8")
 
 [node name="GUILayer" type="CanvasLayer" parent="."]

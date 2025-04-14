@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dwyacp7d5rrdt"]
+
+[ext_resource type="Script" path="res://fix_tilemap_layers.gd" id="1_n7ofu"]
+
+[node name="FixTilemapScene" type="Node"]
+script = ExtResource("1_n7ofu") 
