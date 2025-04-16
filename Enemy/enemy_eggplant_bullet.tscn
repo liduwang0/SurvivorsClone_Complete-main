@@ -1,0 +1,80 @@
+[gd_scene load_steps=7 format=3 uid="uid://b21yjui37dr76"]
+
+[ext_resource type="Texture2D" uid="uid://7b88ashy8im7" path="res://Textures/Enemy/Eggplant Sprite Sheet.png" id="1_osruc"]
+[ext_resource type="Script" uid="uid://bpym6ph5o3xt2" path="res://Enemy/enemy_eggplant_bullet.gd" id="1_qa7vk"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_e2g1a"]
+radius = 5.0
+
+[sub_resource type="Animation" id="Animation_gnkcq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [24]
+}
+
+[sub_resource type="Animation" id="Animation_qa7vk"]
+resource_name = "bullet_fly"
+length = 0.6
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [24, 25, 26, 27, 28, 29]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_sgwlv"]
+_data = {
+&"RESET": SubResource("Animation_gnkcq"),
+&"bullet_fly": SubResource("Animation_qa7vk")
+}
+
+[node name="enemy_eggplant_bullet" type="Area2D" groups=["attack"]]
+z_index = 100
+y_sort_enabled = true
+rotation = 3.14159
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_qa7vk")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(8, 0)
+rotation = 1.5708
+texture = ExtResource("1_osruc")
+hframes = 8
+vframes = 7
+frame = 24
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_e2g1a")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_sgwlv")
+}
+
+[node name="LifeTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
+
+[node name="Sound_shoot" type="AudioStreamPlayer" parent="."]
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="LifeTimer" to="." method="_on_life_timer_timeout"]

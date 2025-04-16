@@ -10,7 +10,7 @@ var map_width = 70
 var map_height = 70
 
 # 地形生成阈值控制
-var water_threshold = -0.6  # 值越低，水越少
+var water_threshold = -0.7  # 值越低，水越少
 var path_threshold = 0.3    # 值越低，路越多
 var tree_density = 0.06     # 树木密度控制（0-1之间，值越低树越少）
 
