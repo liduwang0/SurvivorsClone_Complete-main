@@ -9,15 +9,43 @@ var bullet_shoot_effect = preload("res://Enemy/enemy_eggplant_shoot_effect.tscn"
 var can_shoot = true
 var shoot_timer = 0.0
 var is_shooting = false  # 新增：标记是否正在射击
+var original_movement_speed = 0.0  # 保存原始移动速度
 
 func _ready():
+	# 保存原始移动速度
+	original_movement_speed = movement_speed
+	
 	# 连接动画播放结束的信号
 	if anim and !anim.animation_finished.is_connected(_on_animation_finished):
 		anim.animation_finished.connect(_on_animation_finished)
 
+# 重写父类的物理处理函数，在子类中处理自定义行为
 func _physics_process(delta):
-	# 调用父级方法
-	super._physics_process(delta)
+	# 在攻击时不调用父类的_physics_process，而是自行处理
+	if is_shooting:
+		# 攻击时的处理逻辑 - 主要是停止移动，但保留其他功能
+		if is_dead:
+			return
+		
+		# 原有的击退逻辑
+		knockback = knockback.move_toward(Vector2.ZERO, knockback_recovery)
+		
+		# 只应用击退力，不添加移动速度
+		velocity = knockback
+		
+		# 移动（仅应用击退，没有主动移动）
+		move_and_slide()
+		
+		# 但仍面向玩家
+		if player:
+			var direction = global_position.direction_to(player.global_position)
+			if direction.x > 0.1:
+				sprite.flip_h = true
+			elif direction.x < -0.1:
+				sprite.flip_h = false
+	else:
+		# 非攻击状态，调用父类的物理处理
+		super._physics_process(delta)
 	
 	# 处理射击冷却
 	if !can_shoot:
@@ -50,6 +78,9 @@ func _on_animation_finished(anim_name):
 	if anim_name == "attack":
 		generate_bullet()
 		is_shooting = false  # 射击结束
+		# 恢复行走动画
+		if anim.has_animation("walk"):
+			anim.play("walk")
 	elif anim_name == "dead":
 		# 如果有其他需要在死亡动画结束时处理的逻辑，保留父类的处理
 		super._on_animation_finished(anim_name)
