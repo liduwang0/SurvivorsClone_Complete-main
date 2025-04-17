@@ -108,6 +108,7 @@ size = Vector2(14, 18)
 size = Vector2(12, 18)
 
 [node name="enemy_banana" type="CharacterBody2D" groups=["enemy"]]
+y_sort_enabled = true
 position = Vector2(0, -16)
 collision_layer = 5
 collision_mask = 5
@@ -115,10 +116,10 @@ motion_mode = 1
 script = ExtResource("1_qd2yg")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(-0.111843, 4.27805)
+position = Vector2(0.00757408, 15.9929)
 scale = Vector2(-1, 1)
 texture = ExtResource("2_v0vnq")
-offset = Vector2(-0.111843, -4.27805)
+offset = Vector2(0.00757408, -15.9929)
 hframes = 16
 vframes = 6
 

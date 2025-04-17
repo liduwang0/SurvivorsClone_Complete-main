@@ -6,8 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://uhr6mtuisqm1" path="res://Utility/hit_box.tscn" id="4_yexrv"]
 [ext_resource type="AudioStream" uid="uid://bi7t7cjthnhhc" path="res://Audio/SoundEffect/enemy_hit.ogg" id="5_hf8ms"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_e773v"]
-radius = 2.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_l5ux5"]
+size = Vector2(15, 4)
 
 [sub_resource type="Animation" id="Animation_xfnyu"]
 length = 0.001
@@ -108,6 +108,8 @@ size = Vector2(15, 15)
 size = Vector2(12.5, 14.5)
 
 [node name="enemy_tomato" type="CharacterBody2D" groups=["enemy"]]
+y_sort_enabled = true
+position = Vector2(0, -16)
 collision_layer = 5
 collision_mask = 5
 motion_mode = 1
@@ -116,14 +118,16 @@ hp = 5
 enemy_damage = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-0.0167313, 15.9884)
 scale = Vector2(-1, 1)
 texture = ExtResource("2_po1tl")
+offset = Vector2(-0.0167313, -15.9884)
 hframes = 9
 vframes = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-1, 8)
-shape = SubResource("CircleShape2D_e773v")
+position = Vector2(-0.5, 14)
+shape = SubResource("RectangleShape2D_l5ux5")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
