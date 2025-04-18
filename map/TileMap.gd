@@ -6,8 +6,8 @@ var myNoise3 = FastNoiseLite.new()
 var treeNoise = FastNoiseLite.new()
 
 # 固定地图大小
-var map_width = 70
-var map_height = 70
+var map_width = 40
+var map_height = 40
 
 # 地形生成阈值控制
 var water_threshold = -0.7  # 值越低，水越少
@@ -161,6 +161,9 @@ var tree_sets = [
 	# 可以添加更多树木组合
 ]
 
+@export var debug_draw_obstacles: bool = false  # 是否绘制障碍物调试标记
+@export var debug_marker_size: float = 16.0  # 调试标记的大小
+
 func _ready():
 	# 设置噪声参数
 	myNoise.seed = randi()
@@ -243,6 +246,73 @@ func generate_map():
 	
 	# 为水域添加碰撞
 	add_water_collision()
+	
+	# 创建一个节点来存储障碍物信息
+	if has_node("ObstacleData"):
+		remove_child(get_node("ObstacleData"))
+		
+	var obstacle_data = Node2D.new()
+	obstacle_data.name = "ObstacleData"
+	add_child(obstacle_data)
+	
+	# 为每棵树创建一个标记
+	for x in range(center_x, center_x + map_width):
+		for y in range(center_y, center_y + map_height):
+			var pos = Vector2i(x, y)
+			
+			# 检查TREE_LAYER是否有瓦片
+			var source_id = get_cell_source_id(TREE_LAYER, pos)
+			if source_id >= 0:
+				var atlas_coords = get_cell_atlas_coords(TREE_LAYER, pos)
+				
+				# 检查是否是树木或障碍物
+				var is_obstacle = false
+				
+				# 1. 检查瓦片坐标是否匹配已知的树木类型
+				for tree_set in tree_sets:
+					for piece in tree_set.pieces:
+						if source_id == piece.source_id and atlas_coords == piece.coords:
+							is_obstacle = true
+							break
+					if is_obstacle:
+						break
+				
+				# 2. 或者检查瓦片是否有碰撞数据
+				var tile_data = get_cell_tile_data(TREE_LAYER, pos)
+				if tile_data != null and tile_data.get_collision_polygons_count(0) > 0:
+					is_obstacle = true
+				
+				if is_obstacle:
+					# 创建一个标记
+					var marker = Node2D.new()
+					marker.position = map_to_local(pos)
+					marker.name = "Obstacle_" + str(pos.x) + "_" + str(pos.y)
+					
+					# 添加自定义属性
+					marker.set_meta("is_obstacle", true)
+					marker.set_meta("tile_pos", pos)
+					
+					obstacle_data.add_child(marker)
+	
+	# 将水域也标记为障碍
+	for water_cell in water_cells:
+		# 创建一个标记
+		var marker = Node2D.new()
+		marker.position = map_to_local(water_cell)
+		marker.name = "Water_" + str(water_cell.x) + "_" + str(water_cell.y)
+		
+		# 添加自定义属性
+		marker.set_meta("is_obstacle", true)
+		marker.set_meta("tile_pos", water_cell)
+		marker.set_meta("is_water", true)
+		
+		obstacle_data.add_child(marker)
+	
+	# 如果开启了调试绘制，为每个障碍物标记添加可视指示器
+	if debug_draw_obstacles:
+		add_debug_visuals_to_obstacles(obstacle_data)
+	
+	print("完成障碍物标记，共创建了 ", obstacle_data.get_child_count(), " 个标记")
 
 # 放置树木组合
 func place_tree_sets(grass_cells):
@@ -322,3 +392,56 @@ func regenerate_map():
 	myNoise2.seed = randi() + 100
 	myNoise3.seed = randi() + 200
 	generate_map()
+
+# 添加障碍物的可视化调试标记
+func add_debug_visuals_to_obstacles(obstacle_data):
+	for marker in obstacle_data.get_children():
+		if marker.has_meta("is_obstacle"):
+			var visual = Sprite2D.new()
+			
+			# 根据障碍物类型选择不同的颜色
+			if marker.has_meta("is_water") and marker.get_meta("is_water"):
+				# 水域显示为蓝色半透明矩形
+				var rect = ColorRect.new()
+				rect.color = Color(0, 0, 1, 0.3)  # 蓝色半透明
+				rect.size = Vector2(debug_marker_size, debug_marker_size)
+				rect.position = Vector2(-debug_marker_size/2, -debug_marker_size/2)
+				marker.add_child(rect)
+			else:
+				# 树木和其他障碍物显示为红色圆形
+				var circle = Node2D.new()
+				circle.z_index = 100  # 确保绘制在最上层
+				marker.add_child(circle)
+				
+				# 添加自定义绘制函数
+				circle.set_script(GDScript.new())
+				circle.script.source_code = """
+extends Node2D
+
+func _draw():
+	draw_circle(Vector2.ZERO, %s, Color(1, 0, 0, 0.5))
+	draw_arc(Vector2.ZERO, %s, 0, TAU, 32, Color(1, 0, 0, 0.8), 2)
+""" % [debug_marker_size * 0.4, debug_marker_size * 0.4]
+				circle.script.reload()  # 重新加载脚本
+
+# 重写_draw函数以在编辑器中显示障碍物
+func _draw():
+	if debug_draw_obstacles and has_node("ObstacleData"):
+		for marker in get_node("ObstacleData").get_children():
+			if marker.has_meta("is_obstacle"):
+				var pos = marker.position
+				
+				# 根据障碍物类型绘制不同形状
+				if marker.has_meta("is_water") and marker.get_meta("is_water"):
+					# 水域为蓝色方形
+					var rect_size = Vector2(debug_marker_size, debug_marker_size)
+					draw_rect(Rect2(pos - rect_size/2, rect_size), Color(0, 0, 1, 0.3), true)
+				else:
+					# 其他障碍物为红色圆形
+					draw_circle(pos, debug_marker_size * 0.4, Color(1, 0, 0, 0.5))
+					draw_arc(pos, debug_marker_size * 0.4, 0, TAU, 32, Color(1, 0, 0, 0.8), 2)
+
+# 确保在编辑器中也能看到绘制
+func _process(delta):
+	if debug_draw_obstacles:
+		queue_redraw()  # 持续触发重绘

@@ -233,9 +233,9 @@ func handle_hurt(damage_amount: float, direction: Vector2, knockback_amount: flo
 		# 应用减弱的击退效果
 		knockback += direction * (knockback_amount * 0.3)
 		
-		# 闪烁效果（可选）
+		# 闪烁效果（白色，更明显）
 		if sprite:
-			sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
+			sprite.modulate = Color(10.5, 10.5, 10.5, 1)  # 明亮的白色
 			get_tree().create_timer(0.1).timeout.connect(func(): sprite.modulate = Color(1, 1, 1, 1))
 		
 		# 检查是否死亡

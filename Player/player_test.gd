@@ -78,8 +78,8 @@ const WEAPONS = {
 }
 
 var movement_speed = 100.0
-var hp = 160
-var maxhp = 160
+var hp = 1160
+var maxhp = 1160
 var last_movement = Vector2.UP
 var time = 0
 
@@ -217,7 +217,7 @@ func _ready():
 	#upgrade_character("chef_small_knife1")
 	# 添加这一行来测试擀面杖
 	#upgrade_character("chef_rolling_pin1")
-	upgrade_character("chef_rolling_pin1")
+	upgrade_character("chef_big_knife1")
 	attack()
 	set_expbar(experience, calculate_experiencecap())
 	_on_hurt_box_hurt(0,0,0)

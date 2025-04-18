@@ -63,9 +63,9 @@ func death():
 		anim.play("attack")
 		
 		# 简单闪烁效果
-		var flash_count = 4  # 闪烁5次
+		var flash_count = 4  # 闪烁4次
 		for i in range(flash_count):
-			sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
+			sprite.modulate = Color(10.5, 10.5, 10.5, 1)  # 明亮的白色闪烁
 			await get_tree().create_timer(0.1).timeout
 			sprite.modulate = Color(1, 1, 1, 1)      # 恢复正常
 			await get_tree().create_timer(0.1).timeout
@@ -230,8 +230,8 @@ func handle_hurt(damage_amount: float, direction: Vector2, knockback_amount: flo
 	
 	# 处理受伤效果
 	if sprite:
-		sprite.modulate = Color(1, 0.3, 0.3, 1)  # 变红
-		await get_tree().create_timer(0.2).timeout
+		sprite.modulate = Color(10.5, 10.5, 10.5, 1)  # 明亮的白色闪烁
+		await get_tree().create_timer(0.1).timeout
 		sprite.modulate = Color(1, 1, 1, 1)  # 恢复正常
 	
 	# 处理死亡或受伤动画

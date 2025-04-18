@@ -1,104 +1,59 @@
-[gd_scene load_steps=26 format=3 uid="uid://du6qbgqucaqov"]
+[gd_scene load_steps=17 format=3 uid="uid://bd7itdstpsgyi"]
 
 [ext_resource type="PackedScene" uid="uid://b2jagh3781xbx" path="res://map/tile_map.tscn" id="1_f23eu"]
 [ext_resource type="PackedScene" uid="uid://qx7iuo66euky" path="res://debug_overlay.tscn" id="3_awrha"]
+[ext_resource type="Script" uid="uid://dcacdoxovnuq7" path="res://Utility/flow_field.gd" id="3_c8mw6"]
 [ext_resource type="PackedScene" uid="uid://ba2claihwes2y" path="res://Utility/enemy_spawner.tscn" id="3_p01g4"]
-[ext_resource type="PackedScene" uid="uid://bekpv2b5dk37q" path="res://Enemy/enemy_raddish.tscn" id="4_f23eu"]
-[ext_resource type="PackedScene" uid="uid://dx555w6bn3qso" path="res://Enemy/enemy_flow_field.tscn" id="4_oeat8"]
-[ext_resource type="PackedScene" uid="uid://cj1pnxtlp076v" path="res://Enemy/enemy_banana.tscn" id="5_f23eu"]
+[ext_resource type="PackedScene" uid="uid://dx555w6bn3qso" path="res://Enemy/enemy_flow_field.tscn" id="4_a7c8w"]
 [ext_resource type="Script" uid="uid://b0nbp3g8lr7lh" path="res://Utility/spawn_info.gd" id="5_jj7s8"]
-[ext_resource type="PackedScene" uid="uid://bj5t4h1uacxtk" path="res://Enemy/enemy_cabbage.tscn" id="6_0wqet"]
-[ext_resource type="PackedScene" uid="uid://bnhpyhted0jgh" path="res://Enemy/enemy_eggplant.tscn" id="6_f23eu"]
-[ext_resource type="PackedScene" uid="uid://bbvhxvk65o8el" path="res://Enemy/enemy_tomato.tscn" id="6_rumbx"]
-[ext_resource type="PackedScene" uid="uid://bok7kd2psi5gl" path="res://Enemy/enemy_cyclops.tscn" id="7_unri0"]
-[ext_resource type="PackedScene" uid="uid://hcjnrdsb563h" path="res://Enemy/enemy_juggernaut.tscn" id="8_ltymd"]
-[ext_resource type="PackedScene" uid="uid://btf7clk4jja87" path="res://Enemy/enemy_super.tscn" id="9_xs42h"]
+[ext_resource type="Texture2D" uid="uid://ce0hue7fwpa3a" path="res://Textures/Enemy/giant_amoeba_new.png" id="7_dxcs5"]
 [ext_resource type="AudioStream" uid="uid://bbufl4r1ou1rw" path="res://Audio/Music/battleThemeA.mp3" id="10_rk3we"]
 [ext_resource type="Script" uid="uid://u028ko8kxgwy" path="res://Audio/Music/snd_Music.gd" id="11_ovtx6"]
 [ext_resource type="PackedScene" uid="uid://d3l66ee14h740" path="res://Player/player_test.tscn" id="15_f23eu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c2qys"]
+size = Vector2(119.75, 113.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8vslc"]
+radius = 81.0987
 
 [sub_resource type="Resource" id="Resource_03m25"]
 script = ExtResource("5_jj7s8")
 time_start = 0
 time_end = 30
-enemy = ExtResource("4_oeat8")
-enemy_num = 2
-enemy_spawn_delay = 0
-use_flow_field = false
+enemy = ExtResource("4_a7c8w")
+enemy_num = 1
+enemy_spawn_delay = 1
+use_flow_field = true
 
 [sub_resource type="Resource" id="Resource_ij20a"]
 script = ExtResource("5_jj7s8")
-time_start = 0
-time_end = 30
-enemy = ExtResource("5_f23eu")
+time_start = 5
+time_end = 60
+enemy = ExtResource("4_a7c8w")
 enemy_num = 2
-enemy_spawn_delay = 0
-use_flow_field = false
+enemy_spawn_delay = 3
+use_flow_field = true
 
 [sub_resource type="Resource" id="Resource_68oxv"]
 script = ExtResource("5_jj7s8")
-time_start = 0
-time_end = 30
-enemy = ExtResource("6_0wqet")
-enemy_num = 2
-enemy_spawn_delay = 1
-use_flow_field = false
+time_start = 20
+time_end = 180
+enemy = ExtResource("4_a7c8w")
+enemy_num = 3
+enemy_spawn_delay = 2
+use_flow_field = true
 
 [sub_resource type="Resource" id="Resource_l8y0x"]
 script = ExtResource("5_jj7s8")
-time_start = 0
-time_end = 0
-enemy = ExtResource("6_f23eu")
-enemy_num = 1
-enemy_spawn_delay = 2
-use_flow_field = false
-
-[sub_resource type="Resource" id="Resource_daq1w"]
-script = ExtResource("5_jj7s8")
-time_start = 0
-time_end = 0
-enemy = ExtResource("6_rumbx")
-enemy_num = 2
-enemy_spawn_delay = 1
-use_flow_field = false
-
-[sub_resource type="Resource" id="Resource_0gpiy"]
-script = ExtResource("5_jj7s8")
-time_start = 240
-time_end = 270
-enemy = ExtResource("7_unri0")
-enemy_num = 1
-enemy_spawn_delay = 0
-use_flow_field = false
-
-[sub_resource type="Resource" id="Resource_4teun"]
-script = ExtResource("5_jj7s8")
-time_start = 240
+time_start = 40
 time_end = 240
-enemy = ExtResource("8_ltymd")
-enemy_num = 1
-enemy_spawn_delay = 0
-use_flow_field = false
+enemy = ExtResource("4_a7c8w")
+enemy_num = 5
+enemy_spawn_delay = 3
+use_flow_field = true
 
-[sub_resource type="Resource" id="Resource_rx6id"]
-script = ExtResource("5_jj7s8")
-time_start = 270
-time_end = 300
-enemy = ExtResource("6_rumbx")
-enemy_num = 4
-enemy_spawn_delay = 0
-use_flow_field = false
-
-[sub_resource type="Resource" id="Resource_t2np8"]
-script = ExtResource("5_jj7s8")
-time_start = 300
-time_end = 300
-enemy = ExtResource("9_xs42h")
-enemy_num = 1
-enemy_spawn_delay = 0
-use_flow_field = false
-
-[node name="World" type="Node2D"]
+[node name="FlowFieldObstacleTest" type="Node2D"]
 
 [node name="Node2D" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -108,28 +63,104 @@ position = Vector2(54, 29)
 layer_0/y_sort_enabled = true
 layer_0/tile_data = PackedInt32Array(-1, 0, 0, -131072, 0, 0, -65536, 196608, 0, -196607, 0, 0, -262142, 0, 0, -131071, 196608, 1, -196606, 65536, 1, -65535, 196608, 1, -131070, 196608, 2, -65534, 196608, 2, -65544, 0, 2, -131079, 196608, 0, -131078, 65536, 1, -65541, 196608, 1, -65540, 65536, 1, -4, 65536, 2, -3, 131072, 2, -5, 0, 2, -131077, 65536, 1, -131076, 262144, 0, -131075, 131072, 0, -65539, 131072, 1, -196613, 65536, 0, -196612, 131072, 0, -196614, 65536, 0, -196615, 0, 0, -65542, 65536, 2, -65543, 65536, 2, -131080, 0, 0, -458760, 0, 0, -393224, 0, 1, -327688, 0, 2, -327687, 65536, 2, -327686, 131072, 2, -196603, 327685, 6, -131067, 327685, 8, -131066, 393221, 8, -131065, 196613, 6, -131064, 458757, 8, -196601, 196613, 8, -196602, 393221, 6, -196600, 458757, 6, -196599, 327685, 2, -131063, 196613, 1, -65527, 196613, 1, -65526, 196613, 1, -131062, 196613, 1, -196598, 393221, 2, -262134, 1245189, 0, -262135, 262149, 0, -262136, 393221, 2, -262137, 393221, 2, -393210, 262149, 1, -393209, 1245189, 0, -327673, 393221, 1, -327674, 262149, 1, -327672, 1245189, 0, -393213, 851973, 3, -327677, 983045, 4, -262141, 327685, 5, -262140, 458757, 5, -327676, 458757, 3, -262145, 524293, 3, -196609, 720901, 4, -131073, 524293, 5, -196608, 655365, 5, -262144, 786437, 4, -262143, 655365, 5, -327679, 655365, 3, -327680, 786437, 3, -393206, 196613, 2, -393207, 131077, 2, -393205, 393221, 0, -327667, 196613, 1, -262131, 196613, 1, -262130, 196613, 1, -327666, 196613, 1, -327665, 196613, 1, -262129, 196613, 1, -393201, 1048581, 0, -393202, 589829, 2, -393203, 589829, 2, -327664, 196613, 1, -262128, 196613, 1, -393200, 393221, 2, -393204, 983045, 0, -393198, 196613, 1, -393199, 458757, 2, -327671, 1245189, 0, -327670, 393221, 1, -327669, 1245189, 0, -262133, 1245189, 0, -196597, 393221, 2, -131061, 196613, 1, -393208, 393221, 1, -262139, 720901, 2, -262138, 1048581, 0, -131060, 196613, 1, -196596, 1048581, 1, -196595, 589829, 2, -262132, 458757, 1, -327668, 458757, 1, -131059, 196613, 1, -196594, 589829, 0, -196593, 589829, 2, -131057, 196613, 1, -131058, 196613, 1, -196592, 589829, 2, -131056, 196613, 1, -262127, 196613, 1, -196591, 589829, 0, -131055, 196613, 1, -131054, 196613, 1, -327663, 196613, 1, -196590, 589829, 2, -262126, 196613, 1, -196589, 589829, 2, -131053, 196613, 1, -327662, 196613, 1, -393197, 196613, 1, -327661, 196613, 1, -262125, 196613, 1, -262124, 196613, 1, -327660, 196613, 1, -196588, 720901, 0, 1, 524293, 21, 2, 589829, 21)
 layer_1/tile_data = PackedInt32Array(-327670, 655365, 17, -327672, 524293, 21, -327671, 589829, 21, -262134, 655365, 18)
+debug_draw_obstacles = true
+debug_marker_size = 32.0
+
+[node name="Obstacles" type="Node2D" parent="Node2D"]
+
+[node name="Obstacle1" type="StaticBody2D" parent="Node2D/Obstacles"]
+position = Vector2(200, -50)
+collision_layer = 5
+collision_mask = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Obstacles/Obstacle1"]
+modulate = Color(0.278431, 0.278431, 0.278431, 1)
+scale = Vector2(5, 5)
+texture = ExtResource("7_dxcs5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Obstacles/Obstacle1"]
+position = Vector2(-9.125, 6.75)
+shape = SubResource("RectangleShape2D_c2qys")
+
+[node name="Obstacle2" type="StaticBody2D" parent="Node2D/Obstacles"]
+position = Vector2(300, -200)
+collision_layer = 5
+collision_mask = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Obstacles/Obstacle2"]
+modulate = Color(0.278431, 0.278431, 0.278431, 1)
+scale = Vector2(5, 5)
+texture = ExtResource("7_dxcs5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Obstacles/Obstacle2"]
+position = Vector2(11.25, 0)
+shape = SubResource("RectangleShape2D_c2qys")
+
+[node name="Obstacle3" type="StaticBody2D" parent="Node2D/Obstacles"]
+position = Vector2(400, -100)
+collision_layer = 5
+collision_mask = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Obstacles/Obstacle3"]
+modulate = Color(0.278431, 0.278431, 0.278431, 1)
+scale = Vector2(5, 5)
+texture = ExtResource("7_dxcs5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Obstacles/Obstacle3"]
+position = Vector2(-9, 16)
+shape = SubResource("CircleShape2D_8vslc")
+
+[node name="Obstacle4" type="StaticBody2D" parent="Node2D/Obstacles"]
+position = Vector2(100, -150)
+collision_layer = 5
+collision_mask = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Obstacles/Obstacle4"]
+modulate = Color(0.278431, 0.278431, 0.278431, 1)
+scale = Vector2(5, 5)
+texture = ExtResource("7_dxcs5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Obstacles/Obstacle4"]
+shape = SubResource("CircleShape2D_8vslc")
+
+[node name="Obstacle5" type="StaticBody2D" parent="Node2D/Obstacles"]
+position = Vector2(500, -250)
+collision_layer = 5
+collision_mask = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Obstacles/Obstacle5"]
+modulate = Color(0.278431, 0.278431, 0.278431, 1)
+scale = Vector2(5, 5)
+texture = ExtResource("7_dxcs5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Obstacles/Obstacle5"]
+shape = SubResource("CircleShape2D_8vslc")
+
+[node name="FlowField" type="Node2D" parent="Node2D"]
+script = ExtResource("7_8p76q")
+cell_size = 16
+field_bounds = Rect2(-500, -500, 1000, 1000)
+update_interval = 0.3
+debug_draw = true
+debug_draw_obstacles = true
+dynamic_performance = true
+only_calculate_visible_area = true
+_should_check_static_bodies = true
+obstacle_cost = 1000.0
+tilemap_path = NodePath("../TileMap")
+chunk_size = 32
+use_threading = true
+_should_check_static_bodies = true
 
 [node name="EnemySpawner" parent="Node2D" instance=ExtResource("3_p01g4")]
 y_sort_enabled = true
-spawns = Array[ExtResource("5_jj7s8")]([SubResource("Resource_03m25"), SubResource("Resource_ij20a"), SubResource("Resource_68oxv"), SubResource("Resource_l8y0x"), SubResource("Resource_daq1w"), SubResource("Resource_0gpiy"), SubResource("Resource_4teun"), SubResource("Resource_rx6id"), SubResource("Resource_t2np8")])
+spawns = Array[ExtResource("5_jj7s8")]([SubResource("Resource_03m25"), SubResource("Resource_ij20a"), SubResource("Resource_68oxv"), SubResource("Resource_l8y0x")])
 
 [node name="Player" parent="Node2D" instance=ExtResource("15_f23eu")]
 y_sort_enabled = true
 position = Vector2(342, -88)
 
 [node name="DebugOverlay" parent="Node2D/Player" instance=ExtResource("3_awrha")]
-
-[node name="enemy_cabbage" parent="Node2D" instance=ExtResource("6_0wqet")]
-y_sort_enabled = true
-position = Vector2(290, -91)
-
-[node name="enemy_cabbage2" parent="Node2D" instance=ExtResource("6_0wqet")]
-y_sort_enabled = true
-position = Vector2(289, -121)
-
-[node name="enemy_cabbage3" parent="Node2D" instance=ExtResource("6_0wqet")]
-y_sort_enabled = true
-position = Vector2(317, -72)
 
 [node name="Loot" type="Node2D" parent="." groups=["loot"]]
 
@@ -139,6 +170,3 @@ stream = ExtResource("10_rk3we")
 volume_db = -15.0
 autoplay = true
 script = ExtResource("11_ovtx6")
-
-[node name="enemy_raddish" parent="." instance=ExtResource("4_f23eu")]
-position = Vector2(459, -106)
