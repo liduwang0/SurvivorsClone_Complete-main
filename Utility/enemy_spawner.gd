@@ -4,18 +4,20 @@ extends Node2D
 
 # 性能优化设置
 @export var enable_optimization: bool = true  # 是否启用优化
-@export var max_enemies: int = 200  # 最大敌人数量限制
+@export var max_enemies: int = 300  # 最大敌人数量限制
 @export var max_enemies_per_spawn: int = 30  # 每次生成的最大敌人数量
 @export var culling_distance: float = 2000.0  # 超过此距离的敌人会被清除
 @export var check_culling_interval: int = 5  # 每隔多少秒检查一次清理
 
 @onready var player = get_tree().get_first_node_in_group("player")
 @onready var flow_field = get_node_or_null("../FlowField")
+@onready var tilemap = get_node_or_null("../TileMap")
 
 @export var time = 0
 
 var enemy_count = 0  # 当前敌人数量
 var culling_timer = 0  # 清理计时器
+var max_position_attempts = 10  # 最大尝试次数，防止无限循环
 
 signal changetime(time)
 
@@ -68,8 +70,15 @@ func _on_timer_timeout():
 						continue
 				
 				while counter < spawn_count:
+					# 获取一个随机位置
+					var spawn_position = get_random_position()
+					
+					# 如果返回的是null，表示无法找到有效的非水域位置，跳过此次生成
+					if spawn_position == null:
+						continue
+						
 					var enemy_spawn = new_enemy.instantiate()
-					enemy_spawn.global_position = get_random_position()
+					enemy_spawn.global_position = spawn_position
 					
 					# 如果敌人支持流场寻路，并且Spawn_info配置了使用流场
 					if i.use_flow_field and "use_flow_field" in enemy_spawn:
@@ -142,6 +151,94 @@ func get_random_position():
 			spawn_pos1 = top_left
 			spawn_pos2 = bottom_left
 	
-	var x_spawn = randf_range(spawn_pos1.x, spawn_pos2.x)
-	var y_spawn = randf_range(spawn_pos1.y,spawn_pos2.y)
-	return Vector2(x_spawn,y_spawn)
+	# 尝试最多max_position_attempts次找到一个不在水里的位置
+	var attempts = 0
+	var position = Vector2.ZERO
+	var is_valid_position = false
+	
+	while attempts < max_position_attempts and not is_valid_position:
+		var x_spawn = randf_range(spawn_pos1.x, spawn_pos2.x)
+		var y_spawn = randf_range(spawn_pos1.y, spawn_pos2.y)
+		position = Vector2(x_spawn, y_spawn)
+		
+		# 检查位置是否不在水中
+		is_valid_position = not is_position_in_water(position)
+		attempts += 1
+	
+	# 如果找不到非水域位置，返回null表示不应生成敌人
+	if not is_valid_position:
+		return null
+		
+	# 返回有效的非水域位置
+	return position
+
+# 新增函数：检查位置是否在水中
+func is_position_in_water(position: Vector2) -> bool:
+	# 方法1：检查ObstacleData节点中的水域标记 - 优先使用这种方法，因为它最准确
+	var obstacle_data = null
+	
+	# 尝试获取不同路径下的ObstacleData节点
+	if tilemap != null:
+		obstacle_data = tilemap.get_node_or_null("ObstacleData")
+	else:
+		# 如果没有直接引用到TileMap，尝试在不同路径找到它
+		var world_tilemap = get_node_or_null("../TileMap")
+		if world_tilemap != null:
+			obstacle_data = world_tilemap.get_node_or_null("ObstacleData")
+		else:
+			# 查找第一个TileMap节点
+			var tilemaps = get_tree().get_nodes_in_group("tilemap")
+			if tilemaps.size() > 0:
+				obstacle_data = tilemaps[0].get_node_or_null("ObstacleData")
+	
+	if obstacle_data != null:
+		var cell_size = 32  # 假设的默认单元格大小
+		
+		# 优化：设定检查范围，避免检查所有水域标记
+		for marker in obstacle_data.get_children():
+			if marker.has_meta("is_water") and marker.get_meta("is_water"):
+				# 先做一个粗略的距离检查，减少精确计算次数
+				if abs(marker.global_position.x - position.x) < cell_size and abs(marker.global_position.y - position.y) < cell_size:
+					# 如果水域标记靠近要生成的位置
+					if marker.global_position.distance_to(position) < cell_size:
+						return true
+	
+	# 方法2：通过TileMap直接检查地形类型
+	if tilemap != null:
+		# 将世界坐标转换为TileMap坐标
+		var map_pos = tilemap.local_to_map(tilemap.to_local(position))
+		
+		# 检查TileMap的单元格属性
+		var tile_data = tilemap.get_cell_tile_data(0, map_pos)
+		if tile_data != null:
+			# 检查是否是水域地形（TerrainType.WATER = 2）
+			if tile_data.get_terrain_set() == 0 and tile_data.get_terrain() == 2:
+				return true
+				
+			# 尝试另一种方式检查水域
+			# 有些TileMap可能使用自定义属性标记水域
+			if tile_data.has_custom_data("is_water") and tile_data.get_custom_data("is_water"):
+				return true
+				
+		# 另外，检查是否有水域碰撞体
+		var water_body = tilemap.get_node_or_null("WaterCollision")
+		if water_body != null:
+			for collision in water_body.get_children():
+				if collision is CollisionShape2D:
+					var shape = collision.shape
+					if shape is RectangleShape2D:
+						var rect = Rect2(collision.global_position - shape.size/2, shape.size)
+						if rect.has_point(position):
+							return true
+	
+	# 方法3：使用FlowField中的障碍物信息 - 这是备用方法
+	if flow_field != null:
+		var grid_pos = flow_field.world_to_grid(position)
+		if flow_field.is_valid_cell(grid_pos):
+			# 检查该单元格的成本是否很高（障碍物成本）
+			if flow_field.cost_field[grid_pos.x][grid_pos.y] >= flow_field.obstacle_cost * 0.9:
+				# 注意：这种方法可能会将所有障碍物都视为水，不太准确，但作为备用方法可以接受
+				return true
+	
+	# 默认情况：假设不在水中
+	return false

@@ -10,11 +10,11 @@ var map_width = 40
 var map_height = 40
 
 # 地形生成阈值控制
-var water_threshold = -0.7  # 值越低，水越少
+var water_threshold = -5.5  # 值越低，水越少
 var path_threshold = 0.3    # 值越低，路越多
 var tree_density = 0.06     # 树木密度控制（0-1之间，值越低树越少）
 
-# 定义不同的地形类型
+# 定义不同的地形类型d
 enum TerrainType {
 	PATH = 0,  # 土路
 	GRASS = 1, # 草地

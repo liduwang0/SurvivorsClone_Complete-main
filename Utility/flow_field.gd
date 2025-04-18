@@ -108,17 +108,11 @@ func _ready():
 	# 确保field_bounds是通过值初始化的
 	field_bounds = Rect2(_original_field_bounds.position, _original_field_bounds.size)
 	
-	# 输出field_bounds信息，用于调试
-	print("调试_ready: field_bounds设置为 = ", field_bounds)
-	print("调试_ready: 流场更新间隔设置为 = ", update_interval, " 秒")
-	
 	# 计算网格尺寸
 	grid_size = Vector2i(
 		int(field_bounds.size.x / cell_size),
 		int(field_bounds.size.y / cell_size)
 	)
-	
-	print("调试_ready: 计算的网格尺寸 = ", grid_size)
 	
 	# 获取TileMap引用
 	if not tilemap_path.is_empty():
@@ -135,13 +129,11 @@ func _ready():
 	timer.one_shot = false
 	timer.timeout.connect(_on_update_timer)
 	add_child(timer)
-	print("创建流场备用更新计时器，间隔: ", timer.wait_time, " 秒")
 	
 	# 自动查找并设置玩家作为目标节点
 	if target_node == null:
 		target_node = get_tree().get_first_node_in_group("player")
 		if target_node:
-			print("自动找到玩家节点:", target_node.name)
 			_last_process_position = target_node.global_position  # 初始化位置跟踪
 	
 	# 初始化可见区域
@@ -219,10 +211,6 @@ func _cache_obstacles():
 					"atlas_coords": atlas_coords,
 					"cell_pos": cell_pos  # 保存原始单元格位置
 				})
-	
-	# 调试信息
-	if Engine.get_process_frames() % 120 == 0:
-		print("障碍物缓存更新完成，共 ", _cached_obstacles.size(), " 个障碍物")
 
 func _exit_tree():
 	if use_threading and _thread != null:
@@ -390,10 +378,6 @@ func _calculate_integration_field_threaded(t_cost_field, t_integration_field, ta
 							open_list.append(neighbor)
 
 func _on_update_timer():
-	# 输出调试信息
-	if debug_draw:
-		print("备用定时器触发流场更新")
-	
 	# 设置强制更新标志，确保下一帧一定更新
 	_force_next_update = true
 
@@ -409,40 +393,59 @@ func _process(delta):
 	if is_ready and get_viewport().get_camera_2d() != null:
 		_update_visible_bounds()
 	
+	# 输出当前敌人数量信息
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	var enemy_count = enemies.size()
+	if Engine.get_process_frames() % 30 == 0:  # 每30帧更新一次，避免频繁输出
+		print("敌人数量: ", enemy_count)
+	
 	# 基于玩家位置变化的主动更新机制
 	if is_ready and target_node != null:
-		# 累积自上次更新以来的时间
-		_time_since_last_update += delta
-		
 		# 获取当前玩家位置
 		var current_position = target_node.global_position
 		
 		# 计算自上次处理以来玩家移动的距离
 		var distance_moved = _last_process_position.distance_to(current_position)
 		
+		# 累积自上次更新以来的时间
+		_time_since_last_update += delta
+		
 		# 更新上次处理位置
 		_last_process_position = current_position
 		
-		# 检查是否应该更新流场:
-		# 1. 如果强制更新标志为真
-		# 2. 时间间隔已过
-		# 3. 玩家移动足够距离
-		var should_update = _force_next_update or _time_since_last_update >= update_interval or distance_moved >= position_threshold
+		# 检查是否应该更新流场 - 优先检测移动距离
+		var should_update = false
+		
+		# 1. 首先检查移动距离是否达到阈值
+		if distance_moved >= position_threshold:
+			should_update = true
+			# if debug_draw:
+			# 	print("距离触发更新: 移动了", distance_moved, "单位，超过阈值", position_threshold)
+		# 2. 其次检查时间间隔
+		elif _time_since_last_update >= update_interval:
+			should_update = true
+			# if debug_draw:
+			# 	print("时间触发更新: 经过", _time_since_last_update, "秒，超过间隔", update_interval)
+		# 3. 最后检查强制更新标志
+		elif _force_next_update:
+			should_update = true
+			# if debug_draw:
+			# 	print("强制触发更新")
 		
 		if should_update:
 			# 非线程模式，直接调用更新
 			if not use_threading:
 				update_flow_field()
-				if debug_draw:
-					print("实时位置更新触发流场更新，移动: ", distance_moved, "，间隔: ", _time_since_last_update)
+				# if debug_draw:
+				# 	print("流场更新完成: 移动距离=", distance_moved, "，时间间隔=", _time_since_last_update)
 			# 线程模式，发送更新请求
 			elif not _needs_update:  # 避免重复请求
 				_mutex.lock()
 				_needs_update = true
 				_thread_target_pos = current_position
 				_mutex.unlock()
-				if debug_draw:
-					print("实时位置更新触发线程流场更新，移动: ", distance_moved, "，间隔: ", _time_since_last_update)
+				# if debug_draw:
+				# 	print("线程流场更新请求已发送: 移动距离=", distance_moved, "，时间间隔=", _time_since_last_update)
 				
 			# 重置计时器和强制更新标志
 			_time_since_last_update = 0.0
@@ -452,32 +455,12 @@ func _process(delta):
 	if debug_draw and is_ready:
 		queue_redraw()
 	
-	# 周期性检查并打印边界信息（每100帧一次）
-	if Engine.get_process_frames() % 100 == 0:
-		# 检查field_bounds的完整性
-		var is_field_bounds_intact = (field_bounds.position == _original_field_bounds.position and 
-									field_bounds.size == _original_field_bounds.size)
-		
-		if not is_field_bounds_intact:
-			print("========== 边界完整性警告 ==========")
-			print("红色边界(field_bounds)已被修改!")
-			print("当前值: 位置 = ", field_bounds.position, " 大小 = ", field_bounds.size)
-			print("原始值: 位置 = ", _original_field_bounds.position, " 大小 = ", _original_field_bounds.size)
-			print("====================================")
-			
-			# 修复field_bounds
-			_ensure_field_bounds_integrity()
+	# 修复field_bounds
+	_ensure_field_bounds_integrity()
 
 func _draw():
 	if not debug_draw or not is_ready:
 		return
-	
-	# 减少调试输出频率，每60帧输出一次
-	if Engine.get_process_frames() % 60 == 0:
-		print("========== 调试边界信息 ==========")
-		print("红色边界(field_bounds): 位置 = ", field_bounds.position, " 大小 = ", field_bounds.size)
-		print("绿色边界(visible_bounds): 位置 = ", visible_bounds.position, " 大小 = ", visible_bounds.size)
-		print("==================================")
 	
 	# 首先绘制总场地边界，确保它在下层
 	draw_rect(field_bounds, Color(1, 0, 0, 0.3), false, 5.0)
@@ -686,24 +669,20 @@ func _adjust_performance_parameters():
 	# 根据敌人数量动态调整参数
 	if enemy_count > 50:
 		# 大量敌人：低精度，慢更新
-		update_interval = 0.3
-		position_threshold = 4.0
+		update_interval = 1
+		position_threshold = 2.0
 	elif enemy_count > 25:
 		# 中等敌人：中等精度
-		update_interval = 0.5
-		position_threshold = 3.0
+		update_interval = 1
+		position_threshold = 2.0
 	else:
 		# 少量敌人：高精度，快更新
-		update_interval = 0.3
-		position_threshold = 3.0
+		update_interval = 1
+		position_threshold = 2.0
 	
 	# 如果更新间隔改变了，更新定时器
 	if previous_interval != update_interval and timer != null:
 		timer.wait_time = update_interval
-		
-		# 输出调试信息
-		if debug_draw and Engine.get_process_frames() % 60 == 0:
-			print("动态调整流场更新间隔: ", previous_interval, " -> ", update_interval, " 秒 (敌人数量: ", enemy_count, ")")
 
 func update_flow_field():
 	if target_node == null:
@@ -731,13 +710,6 @@ func update_flow_field():
 	# 计算目标单元格
 	var new_target_cell = world_to_grid(target_position)
 	
-	# 输出调试信息
-	if debug_draw and target_cell != new_target_cell:
-		if target_cell != Vector2i(-1, -1):
-			print("目标单元格改变: ", target_cell, " -> ", new_target_cell)
-		else:
-			print("首次设置目标单元格: ", new_target_cell)
-	
 	# 更新目标单元格
 	target_cell = new_target_cell
 	
@@ -763,7 +735,6 @@ func update_flow_field():
 	# 调试绘制
 	if debug_draw:
 		queue_redraw()
-		print("流场更新完成，耗时: ", (Time.get_ticks_msec() / 1000.0) - current_time, " 秒")
 	
 	# 更新后再次检查field_bounds的完整性
 	_ensure_field_bounds_integrity()
@@ -779,7 +750,6 @@ func _update_cost_field():
 		# 方法1: 使用ObstacleData节点中的标记（这是最高效的方法）
 		var obstacle_data = tilemap.get_node_or_null("ObstacleData")
 		if obstacle_data != null:
-			print("找到ObstacleData节点，障碍物标记数量: ", obstacle_data.get_child_count())
 			for marker in obstacle_data.get_children():
 				if marker.has_meta("is_obstacle") and marker.get_meta("is_obstacle"):
 					# 将标记位置转换为流场网格坐标
@@ -804,11 +774,9 @@ func _update_cost_field():
 								# 确保障碍物代价足够高，以便敌人绕行
 								cost_field[obstacle_cell.x][obstacle_cell.y] = obstacle_cost
 			
-			if debug_draw:
-				print("障碍物标记已应用到流场中，网格大小: ", grid_size, "，单元格大小: ", cell_size)
 			return  # 如果使用了ObstacleData，就不需要再使用其他检测方法
 		else:
-			print("未找到ObstacleData节点，尝试其他障碍物检测方法")
+			pass
 		
 		# 方法2: 使用预定义的障碍物瓦片检测（如果ObstacleData不存在）
 		_add_tilemap_obstacles()
@@ -1069,14 +1037,14 @@ func _update_visible_bounds():
 		_cache_obstacles()
 	
 	# 只在每30帧或明显变化时打印调试信息
-	if Engine.get_process_frames() % 30 == 0 or (old_visible_bounds.position - visible_bounds.position).length() > cell_size:
-		print("========== 可见区域更新 ==========")
-		print("玩家位置: ", player_pos)
-		print("可见区域设置: ", visible_area_width, " x ", visible_area_height)
-		print("更新前绿色边界: 位置 = ", old_visible_bounds.position, " 大小 = ", old_visible_bounds.size)
-		print("更新后绿色边界: 位置 = ", visible_bounds.position, " 大小 = ", visible_bounds.size)
-		print("红色边界(field_bounds): 位置 = ", field_bounds.position, " 大小 = ", field_bounds.size)
-		print("==================================")
+	# if Engine.get_process_frames() % 30 == 0 or (old_visible_bounds.position - visible_bounds.position).length() > cell_size:
+	# 	print("========== 可见区域更新 ==========")
+	# 	print("玩家位置: ", player_pos)
+	# 	print("可见区域设置: ", visible_area_width, " x ", visible_area_height)
+	# 	print("更新前绿色边界: 位置 = ", old_visible_bounds.position, " 大小 = ", old_visible_bounds.size)
+	# 	print("更新后绿色边界: 位置 = ", visible_bounds.position, " 大小 = ", visible_bounds.size)
+	# 	print("红色边界(field_bounds): 位置 = ", field_bounds.position, " 大小 = ", field_bounds.size)
+	# 	print("==================================")
 	
 	# 更新完成后，确保field_bounds没有被修改
 	_ensure_field_bounds_integrity()
@@ -1226,9 +1194,9 @@ func _add_tilemap_obstacles():
 func _ensure_field_bounds_integrity():
 	# 检查position和size是否完全相同
 	if field_bounds.position != _original_field_bounds.position or field_bounds.size != _original_field_bounds.size:
-		print("警告：field_bounds被修改，正在恢复...")
-		print("当前值:", field_bounds)
-		print("正确值:", _original_field_bounds)
+		# print("警告：field_bounds被修改，正在恢复...")
+		# print("当前值:", field_bounds)
+		# print("正确值:", _original_field_bounds)
 		
 		# 创建一个全新的Rect2实例，确保完全断开任何可能的引用
 		field_bounds = Rect2(_original_field_bounds.position.x, _original_field_bounds.position.y, 
